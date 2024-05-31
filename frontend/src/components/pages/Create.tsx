@@ -1,4 +1,4 @@
-import { Autocomplete, Button, TextField } from "@mui/material";
+import { Autocomplete, Button, InputAdornment, TextField } from "@mui/material";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 
@@ -46,6 +46,9 @@ function CreateAuctions() {
         label="Base Price"
         sx={{ width: "500px" }}
         type="number"
+        InputProps={{
+          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+        }}
       />
       <div className="flex flex-row gap-10">
         <div>

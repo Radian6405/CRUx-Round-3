@@ -22,6 +22,7 @@ function RoomView() {
         <div className="flex flex-row justify-end">
           <div className="w-3/4 flex flex-wrap justify-start gap-4 pr-5 ">
             <AuctionCard
+              to="/auctions/1"
               title="Auction 1"
               description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
               listerUsername="Gamerboi1"
@@ -30,6 +31,7 @@ function RoomView() {
               auctionTags={["hallo", "hi", "sup" + "hi", "sup", "test", "hmmm"]}
             />
             <AuctionCard
+              to="/auctions/1"
               title="Auction 1"
               description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
               listerUsername="Gamerboi2"
@@ -38,6 +40,7 @@ function RoomView() {
               auctionTags={["hallo", "hi", "sup" + "hi", "sup", "test", "hmmm"]}
             />
             <AuctionCard
+              to="/auctions/1"
               title="Auction 1"
               description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
               listerUsername="Gamerboi4"
@@ -46,6 +49,7 @@ function RoomView() {
               auctionTags={["hallo", "hi", "sup" + "hi", "sup", "test", "hmmm"]}
             />
             <AuctionCard
+              to="/auctions/1"
               title="Auction 1"
               description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
               listerUsername="Gamerboi3"
