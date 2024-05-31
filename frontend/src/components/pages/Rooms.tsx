@@ -1,12 +1,12 @@
 import { Chip } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Header, SplitBar } from "../../util/Misc";
+import { Header, SplitBar } from "../util/Misc";
 
 function Rooms() {
   return (
     <>
       <div className="flex flex-col gap-2 p-5">
-        <Header text="My Rooms"/>
+        <Header text="My Rooms" />
         <SplitBar />
         <RoomListItem
           to="/rooms/1"

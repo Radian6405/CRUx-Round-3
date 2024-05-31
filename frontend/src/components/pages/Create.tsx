@@ -3,7 +3,7 @@ import { useState } from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { Header } from "../../util/Misc";
+import { Header } from "../util/Misc";
 
 function Create() {
   return (
@@ -84,7 +84,7 @@ function CreateAuctions() {
 function CreateRoom() {
   return (
     <div className="p-5 flex flex-col gap-5 items-center border-2">
-      <Header text="Rooms"/>
+      <Header text="Rooms" />
       <div className="w-3/4 text-md text-gray-500 text-center">
         Create private room to create auctions which are visible to only
         selected users
