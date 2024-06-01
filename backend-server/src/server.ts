@@ -2,12 +2,13 @@ import express, {Express, Request, Response} from "express";
 import mongoose from "mongoose";
 import cors from 'cors';
 import { config } from "./config";
+import Routes from "./routes/index"
 
-const PORT = config.server.port;
-
+const PORT:number = config.server.port;
 const app:Express = express();
 
 app.use(express.json());
+app.use(Routes)
 app.use(cors());
 
 (async function startUp() {
