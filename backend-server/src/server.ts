@@ -3,13 +3,24 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { config } from "./config";
 import Routes from "./routes/index";
+import session from "express-session";
 
 const PORT: number = config.server.port;
 const app: Express = express();
 
 app.use(express.json());
-app.use(Routes);
 app.use(cors());
+app.use(
+  session({
+    secret: "random text",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      maxAge: 60000 * 60,
+    },
+  })
+);
+app.use(Routes);
 
 (async function startUp() {
   try {
