@@ -18,6 +18,12 @@ export default function Navbar() {
           <Link to={"/create"}>
             <Button color="inherit">Create</Button>
           </Link>
+          <Link to={"/login"}>
+            <Button color="inherit">Login</Button>
+          </Link>
+          <Link to={"/logout"}>
+            <Button color="inherit">Logout</Button>
+          </Link>
         </Toolbar>
       </AppBar>
     </Box>
