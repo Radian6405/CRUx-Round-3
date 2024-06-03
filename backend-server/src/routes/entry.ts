@@ -30,9 +30,10 @@ router.post("/api/login", async (req: Request, res: Response) => {
       throw new Error();
 
     req.session.username = String(findUser.username);
-    res.sendStatus(200);
+    req.session.email = String(findUser.email);
+    res.status(200).send({ message: `Logged in as ${username}` });
   } catch (err) {
-    res.status(401).send("Bad Credentials");
+    res.status(401).send({ message: "Bad Credentials" });
   }
 });
 
@@ -43,7 +44,18 @@ router.post("/api/logout", (req: Request, res: Response) => {
 });
 
 router.get("/api/status", (req: Request, res: Response) => {
-  res.send(req.session.username);
+  console.log(req.session);
+  res.send(
+    !req.session.username
+      ? {
+          isLoggedIn: false,
+        }
+      : {
+          isLoggedIn: true,
+          username: req.session.username,
+          email: req.session.email,
+        }
+  );
 });
 
 export default router;

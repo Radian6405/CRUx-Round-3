@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Header } from "../util/Misc";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
-import React from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 function Login() {
@@ -24,7 +24,9 @@ function Login() {
 }
 
 function LoginCard() {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -33,6 +35,18 @@ function LoginCard() {
   ) => {
     event.preventDefault();
   };
+  async function handleLogin() {
+    const response: Response = await fetch("http://localhost:8000/api/login", {
+      method: "POST",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: username, password: password }),
+    });
+    return response;
+  }
 
   return (
     <div
@@ -42,12 +56,24 @@ function LoginCard() {
       }
     >
       <Header text="Login" />
-      <TextField required label="Username" sx={{ width: "400px" }} />
+      <TextField
+        required
+        label="Username"
+        sx={{ width: "400px" }}
+        value={username}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          setUsername(event.target.value);
+        }}
+      />
       <FormControl required sx={{ width: "400px" }} variant="outlined">
         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
         <OutlinedInput
           id="outlined-adornment-password"
           type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setPassword(event.target.value);
+          }}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -63,7 +89,7 @@ function LoginCard() {
           label="Password"
         />
       </FormControl>
-      <Button variant="outlined" size="large">
+      <Button variant="outlined" size="large" onClick={() => handleLogin()}>
         Login
       </Button>
       <div className="text-md">
@@ -109,9 +135,11 @@ function RegisterCard() {
       <TextField required label="Username" sx={{ width: "400px" }} />
       <TextField required label="Email" sx={{ width: "400px" }} />
       <FormControl required sx={{ width: "400px" }} variant="outlined">
-        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+        <InputLabel htmlFor="outlined-adornment-register-password">
+          Password
+        </InputLabel>
         <OutlinedInput
-          id="outlined-adornment-password"
+          id="outlined-adornment-register-password"
           type={showPassword ? "text" : "password"}
           endAdornment={
             <InputAdornment position="end">
@@ -129,11 +157,11 @@ function RegisterCard() {
         />
       </FormControl>
       <FormControl required sx={{ width: "400px" }} variant="outlined">
-        <InputLabel htmlFor="outlined-adornment-password">
+        <InputLabel htmlFor="outlined-adornment-confirm-password">
           Confirm password
         </InputLabel>
         <OutlinedInput
-          id="outlined-adornment-password"
+          id="outlined-adornment-confirm-password"
           type={showConfirmPassword ? "text" : "password"}
           endAdornment={
             <InputAdornment position="end">
