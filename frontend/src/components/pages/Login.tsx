@@ -11,6 +11,7 @@ import { Header } from "../util/Misc";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
   return (
@@ -35,17 +36,26 @@ function LoginCard() {
   ) => {
     event.preventDefault();
   };
+
   async function handleLogin() {
-    const response: Response = await fetch("http://localhost:8000/api/login", {
-      method: "POST",
-      cache: "no-cache",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username: username, password: password }),
-    });
-    return response;
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/login",
+        { username, password },
+        { withCredentials: true }
+      );
+
+      const statusResponse = await axios.get("http://localhost:8000/api/status", {
+        withCredentials: true
+      });
+
+      console.log(statusResponse.data);
+      
+      return response;
+    } catch (error) {
+      console.error("Error during login:", error);
+      return null;
+    }
   }
 
   return (
