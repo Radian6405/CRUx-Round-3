@@ -1,7 +1,10 @@
-declare module "express-session" {
-  interface SessionData {
-    username: string;
-    email: string;
+declare global {
+  namespace Express {
+    interface User {
+      username: string;
+      email: string;
+      _id?: number;
+    }
   }
 }
 

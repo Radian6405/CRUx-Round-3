@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express";
 import { User } from "../../mongoose/schemas/User";
 import { comparePassword, hashPassword } from "../utils/helpers";
+import "../strategies/local-strategy";
+import passport from "passport";
 
 const router: Router = Router();
 
@@ -19,41 +21,34 @@ router.post("/api/register", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/api/login", async (req: Request, res: Response) => {
-  const {
-    body: { username, password },
-  } = req;
-  try {
-    const findUser = await User.findOne({ username });
-    if (!findUser) throw new Error();
-    if (!comparePassword(password, String(findUser.password)))
-      throw new Error();
-
-    req.session.username = String(findUser.username);
-    req.session.email = String(findUser.email);
-    res.status(200).send({ message: `Logged in as ${username}` });
-  } catch (err) {
-    res.status(401).send({ message: "Bad Credentials" });
+router.post(
+  "/api/login",
+  passport.authenticate("local"),
+  async (req: Request, res: Response) => {
+    const {
+      body: { username },
+    } = req;
+    res.status(200).send(`logged in as ${username}`);
   }
-});
+);
 
 router.post("/api/logout", (req: Request, res: Response) => {
-  req.session.destroy((err) => {
+  if (!req.user) return res.sendStatus(401);
+  req.logout((err) => {
+    if (err) return res.sendStatus(400);
     res.sendStatus(200);
   });
 });
 
 router.get("/api/status", (req: Request, res: Response) => {
-  console.log(req.session);
   res.send(
-    !req.session.username
+    req.user
       ? {
-          isLoggedIn: false,
+          isLoggedIn: true,
+          user: req.user,
         }
       : {
-          isLoggedIn: true,
-          username: req.session.username,
-          email: req.session.email,
+          isLoggedIn: false,
         }
   );
 });

@@ -4,6 +4,7 @@ import cors from "cors";
 import { config } from "./config";
 import Routes from "./routes/index";
 import session from "express-session";
+import passport from "passport";
 
 const PORT: number = config.server.port;
 const app: Express = express();
@@ -23,6 +24,8 @@ app.use(
     },
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(Routes);
 
 (async function startUp() {
