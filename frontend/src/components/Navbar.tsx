@@ -4,14 +4,22 @@ import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+// import { Cookies } from "react-cookie";
 
 export default function Navbar() {
-  const [user, setUser] = useState({isLoggedIn: false});
+  const [username, setUsername] = useState("");
+  const [cookie] = useCookies(["token"]);
   async function getUserData() {
-    const response = await fetch("http://localhost:8000/api/status");
-    const data = await response.json();
-    setUser(data);
-    // console.log(data)
+    const statusResponse = await axios.get("http://localhost:8000/api/status", {
+      withCredentials: true,
+      headers: { Authorization: cookie.token },
+    });
+    statusResponse.data.user !== undefined
+      ? setUsername(statusResponse.data.username)
+      : setUsername("");
+    // console.log(statusResponse.data);
   }
   useEffect(() => {
     getUserData();
@@ -29,7 +37,7 @@ export default function Navbar() {
           <Link to={"/create"}>
             <Button color="inherit">Create</Button>
           </Link>
-          {user.isLoggedIn ? (
+          {username !== "" ? (
             <Link to={"/logout"}>
               <Button color="inherit">Logout</Button>
             </Link>

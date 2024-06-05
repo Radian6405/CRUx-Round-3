@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(
   session({
-    secret: "random text",
+    secret: "random_text",
     saveUninitialized: false,
     resave: false,
     cookie: {

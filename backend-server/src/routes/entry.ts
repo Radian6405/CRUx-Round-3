@@ -3,6 +3,8 @@ import { User } from "../../mongoose/schemas/User";
 import { comparePassword, hashPassword } from "../utils/helpers";
 import "../strategies/local-strategy";
 import passport from "passport";
+import jwt from "jsonwebtoken";
+import { authenticateToken, generateAccessTokens } from "../utils/authHelpers";
 
 const router: Router = Router();
 
@@ -28,7 +30,7 @@ router.post(
     const {
       body: { username },
     } = req;
-    res.status(200).send(`logged in as ${username}`);
+    res.status(200).send(generateAccessTokens(username));
   }
 );
 
@@ -40,17 +42,18 @@ router.post("/api/logout", (req: Request, res: Response) => {
   });
 });
 
-router.get("/api/status", (req: Request, res: Response) => {
-  res.send(
-    req.user
-      ? {
-          isLoggedIn: true,
-          user: req.user,
-        }
-      : {
-          isLoggedIn: false,
-        }
-  );
+router.get("/api/status", authenticateToken, (req: Request, res: Response) => {
+  // res.send(
+  //   req.user
+  //     ? {
+  //         isLoggedIn: true,
+  //         user: req.user,
+  //       }
+  //     : {
+  //         isLoggedIn: false,
+  //       }
+  // );
+  res.send(req.user);
 });
 
 export default router;

@@ -12,6 +12,7 @@ import { VisibilityOff, Visibility } from "@mui/icons-material";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 
 function Login() {
   return (
@@ -29,6 +30,7 @@ function LoginCard() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [, setCookie] = useCookies(["token"]);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (
@@ -44,13 +46,8 @@ function LoginCard() {
         { username, password },
         { withCredentials: true }
       );
+      setCookie("token", response.data, { path: "/", maxAge: 60 * 60 * 24 });
 
-      const statusResponse = await axios.get("http://localhost:8000/api/status", {
-        withCredentials: true
-      });
-
-      console.log(statusResponse.data);
-      
       return response;
     } catch (error) {
       console.error("Error during login:", error);
