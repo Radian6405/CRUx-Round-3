@@ -3,29 +3,12 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { config } from "./config";
 import Routes from "./routes/index";
-import session from "express-session";
-import passport from "passport";
 
 const PORT: number = config.server.port;
 const app: Express = express();
 
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
-app.use(
-  session({
-    secret: "random_text",
-    saveUninitialized: false,
-    resave: false,
-    cookie: {
-      maxAge: 60000 * 60 * 24,
-      secure: false,
-      httpOnly: true,
-      sameSite: false,
-    },
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(Routes);
 
 (async function startUp() {

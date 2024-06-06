@@ -27,8 +27,6 @@
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.0",
-    "passport": "^0.7.0",
-    "passport-local": "^1.0.0",
     "rimraf": "^5.0.7"
   },
   "devDependencies": {

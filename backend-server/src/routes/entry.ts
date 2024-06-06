@@ -1,9 +1,6 @@
 import { Router, Request, Response } from "express";
 import { User } from "../../mongoose/schemas/User";
 import { comparePassword, hashPassword } from "../utils/helpers";
-import "../strategies/local-strategy";
-import passport from "passport";
-import jwt from "jsonwebtoken";
 import { authenticateToken, generateAccessTokens } from "../utils/authHelpers";
 
 const router: Router = Router();
@@ -23,36 +20,22 @@ router.post("/api/register", async (req: Request, res: Response) => {
   }
 });
 
-router.post(
-  "/api/login",
-  passport.authenticate("local"),
-  async (req: Request, res: Response) => {
-    const {
-      body: { username },
-    } = req;
+router.post("/api/login", async (req: Request, res: Response) => {
+  const {
+    body: { username, password },
+  } = req;
+  try {
+    const findUser = await User.findOne({ username });
+    if (!findUser) throw new Error("User not found");
+    if (!comparePassword(password, String(findUser.password)))
+      throw new Error("Invalid credentials");
     res.status(200).send(generateAccessTokens(username));
+  } catch (err) {
+    res.status(401).send(err);
   }
-);
-
-router.post("/api/logout", (req: Request, res: Response) => {
-  if (!req.user) return res.sendStatus(401);
-  req.logout((err) => {
-    if (err) return res.sendStatus(400);
-    res.sendStatus(200);
-  });
 });
 
 router.get("/api/status", authenticateToken, (req: Request, res: Response) => {
-  // res.send(
-  //   req.user
-  //     ? {
-  //         isLoggedIn: true,
-  //         user: req.user,
-  //       }
-  //     : {
-  //         isLoggedIn: false,
-  //       }
-  // );
   res.send(req.user);
 });
 
