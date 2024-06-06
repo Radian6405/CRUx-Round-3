@@ -7,15 +7,14 @@ export function generateAccessTokens(username: string) {
 
 export function authenticateToken(req: Request, res: Response, next: Function) {
   const authHeader = req.headers.authorization;
-  //   const token = authHeader && authHeader.split(" ")[1];
 
-  if (authHeader == null) return res.status(200).send({message: "no token"});
+  if (authHeader == null) return res.status(200).send({ message: "no token" });
 
   jwt.verify(authHeader, "random_text", (err: any, user: any) => {
     if (err) return res.sendStatus(403);
     req.user = user;
 
-    console.log(req.user);
+    // console.log(req.user);
     next();
   });
 }

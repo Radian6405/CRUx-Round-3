@@ -16,7 +16,7 @@ router.post("/api/register", async (req: Request, res: Response) => {
   const newUser = new User(body);
   try {
     const savedUser = await newUser.save();
-    res.status(201).send(savedUser);
+    res.status(201).send(generateAccessTokens(body.username));
   } catch (err) {
     console.log(`Error: ${err}`);
     res.sendStatus(400);

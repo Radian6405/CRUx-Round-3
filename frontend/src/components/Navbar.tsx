@@ -16,36 +16,48 @@ export default function Navbar() {
       withCredentials: true,
       headers: { Authorization: cookie.token },
     });
-    statusResponse.data.user !== undefined
+    statusResponse.data.username !== undefined
       ? setUsername(statusResponse.data.username)
       : setUsername("");
-    // console.log(statusResponse.data);
+    // console.log(statusResponse.data.username);
   }
   useEffect(() => {
     getUserData();
-  }, []);
+  }, [, cookie]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar sx={{ justifyContent: "center" }}>
-          <Link to={"/"}>
-            <Button color="inherit">Auctions</Button>
-          </Link>
-          <Link to={"/rooms"}>
-            <Button color="inherit">Rooms</Button>
-          </Link>
-          <Link to={"/create"}>
-            <Button color="inherit">Create</Button>
-          </Link>
-          {username !== "" ? (
-            <Link to={"/logout"}>
-              <Button color="inherit">Logout</Button>
+        <Toolbar className="justify-between gap-10">
+          <div className="mx-10">
+            <Link to={"/"}>
+              <Button color="inherit">Auctions</Button>
             </Link>
-          ) : (
-            <Link to={"/login"}>
-              <Button color="inherit">Login</Button>
+            <Link to={"/rooms"}>
+              <Button color="inherit">Rooms</Button>
             </Link>
-          )}
+            <Link to={"/create"}>
+              <Button color="inherit">Create</Button>
+            </Link>
+          </div>
+          <div className="mx-10">
+            {username !== "" ? (
+              <>
+                <Link to={"/logout"}>
+                  <Button color="inherit">Logout</Button>
+                </Link>
+                <Button variant="contained">{username}</Button>
+              </>
+            ) : (
+              <>
+                <Link to={"/login"}>
+                  <Button color="inherit">Login</Button>
+                </Link>
+                <Link to={"/register"}>
+                  <Button color="inherit">Register</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </Toolbar>
       </AppBar>
     </Box>

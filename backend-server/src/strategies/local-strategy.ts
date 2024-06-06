@@ -5,13 +5,13 @@ import { comparePassword } from "../utils/helpers";
 import { User } from "../../mongoose/schemas/User";
 
 passport.serializeUser((user, done) => {
-  //   console.log(user._id);
   done(null, user._id);
 });
 passport.deserializeUser(async (id, done) => {
   try {
     const findUser = await User.findById(id);
     if (!findUser) throw new Error("User not found");
+    // console.log(findUser);
     done(null, findUser);
   } catch (err) {
     done(err, null);

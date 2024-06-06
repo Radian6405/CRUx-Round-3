@@ -7,6 +7,7 @@ import RoomView from "./components/pages/RoomView";
 import AuctionPage from "./components/pages/AuctionPage";
 import Login from "./components/pages/Login";
 import Logout from "./components/pages/Logout";
+import Register from "./components/pages/Register";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </>
   );
