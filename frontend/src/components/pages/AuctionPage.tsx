@@ -1,8 +1,10 @@
 import { Button, Chip, InputAdornment, TextField } from "@mui/material";
 import { CommentCard, UserCard } from "../util/Cards";
 import { Header, SplitBar } from "../util/Misc";
+// import { useParams } from "react-router-dom";
 
 function AuctionPage() {
+  // const {auctionID} = useParams();
   return (
     <>
       <div className="m-5">
