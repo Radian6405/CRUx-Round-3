@@ -26,4 +26,13 @@ router.get(
   }
 );
 
+router.post("/api/getone/room", async (req: Request, res: Response) => {
+  const data = await Room.findById(req.body.id)
+    .populate("creator", "username")
+    .populate("admins", "username")
+    .populate("members", "username");
+
+  res.send(data);
+});
+
 export default router;

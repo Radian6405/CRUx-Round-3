@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 const TOKEN_SECRET = "random_text";
 
 export function generateAccessTokens(username: string) {
-  console.log(process.env);
   return jwt.sign({ username: username }, TOKEN_SECRET, {
     expiresIn: "1d",
   });

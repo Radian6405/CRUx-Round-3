@@ -22,7 +22,7 @@ export function AuctionCard({
   auctionTags,
 }: AuctionCardProps) {
   return (
-    <div className="flex flex-col justify-between w-[400px] gap-2 p-5 bg-gray-300">
+    <div className="flex flex-col justify-between w-[400px] h-72 gap-2 p-5 bg-gray-300">
       <div className="flex flex-row gap-2 items-end">
         <div className="text-4xl font-bold truncate">{title}</div>
         <Chip label={listerUsername} variant="outlined" size="medium" />

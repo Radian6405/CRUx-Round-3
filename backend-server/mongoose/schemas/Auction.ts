@@ -35,6 +35,10 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
     type: mongoose.Schema.Types.Boolean,
     required: true,
   },
+  room: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Room"
+  },
 
   //user details
   seller: {
