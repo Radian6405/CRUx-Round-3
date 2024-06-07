@@ -1,20 +1,51 @@
 import { Chip } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Header, SplitBar } from "../util/Misc";
+import { useCookies } from "react-cookie";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Rooms() {
+  const [cookie] = useCookies(["token"]);
+  const [roomData, setRoomData] = useState([
+    {
+      _id: "",
+      name: "",
+      description: "",
+      creator: { username: "" },
+      auctionCount: 0,
+    },
+  ]);
+
+  async function getRoomData() {
+    const response = await axios.get("http://localhost:8000/api/getall/rooms", {
+      withCredentials: true,
+      headers: { Authorization: cookie.token },
+    });
+    setRoomData(response.data);
+    // console.log(response.data);
+  }
+
+  useEffect(() => {
+    getRoomData();
+  }, []);
   return (
     <>
       <div className="flex flex-col gap-2 p-5">
         <Header text="My Rooms" />
         <SplitBar />
-        <RoomListItem
-          to="/rooms/1"
-          title="Room1"
-          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-          activeListings={5}
-          adminUsername="GoodBoi"
-        />
+        {roomData.map((room) => {
+          return (
+            <RoomListItem
+              key={crypto.randomUUID()}
+              to={`/rooms/${room._id}`}
+              title={room.name}
+              description={room.description}
+              activeListings={room.auctionCount}
+              adminUsername={room.creator.username}
+            />
+          );
+        })}
       </div>
     </>
   );

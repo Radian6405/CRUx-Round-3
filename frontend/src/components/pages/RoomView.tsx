@@ -20,7 +20,7 @@ function RoomView() {
         </div>
         <SplitBar />
         <div className="flex flex-row justify-end">
-          <div className="w-3/4 flex flex-wrap justify-start gap-4 pr-5 ">
+          <div className="w-4/5 flex flex-wrap justify-start gap-4 pr-5 ">
             <AuctionCard
               to="/auctions/1"
               title="Auction 1"
@@ -58,7 +58,7 @@ function RoomView() {
               auctionTags={["hallo", "hi", "sup" + "hi", "sup", "test", "hmmm"]}
             />
           </div>
-          <div className="w-1/4 min-w-80 p-5 flex flex-col gap-2 bg-blue-500  ">
+          <div className="w-1/5 min-w-80 p-5 flex flex-col gap-2 bg-blue-500  ">
             <Header text="Users" />
             <SplitBar />
             <UserCard userName="FunnyGuy" userRole="Creator" />

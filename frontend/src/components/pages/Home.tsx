@@ -17,7 +17,7 @@ function Home() {
 
   async function getAuctionData() {
     const response = await axios.get(
-      "http://localhost:8000/api/auctions/public",
+      "http://localhost:8000/api/getall/auctions/public",
       {
         withCredentials: true,
       }

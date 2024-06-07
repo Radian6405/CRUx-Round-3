@@ -6,11 +6,11 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-// import { Cookies } from "react-cookie";
 
 export default function Navbar() {
   const [username, setUsername] = useState("");
   const [cookie] = useCookies(["token"]);
+
   async function getUserData() {
     const statusResponse = await axios.get("http://localhost:8000/api/status", {
       withCredentials: true,

@@ -5,32 +5,27 @@ import { parseAuction } from "../utils/helpers";
 
 const router: Router = Router();
 
-router.get("/api/auctions/public", async (req: Request, res: Response) => {
-  const auctions = await Auction.find({}, [
-    "title",
-    "description",
-    "basePrice",
-    "seller",
-    "tags",
-  ])
-    .limit(20)
-    .populate("seller", ["username"]); //just for testing
+router.get(
+  "/api/getall/auctions/public",
+  async (req: Request, res: Response) => {
+    const auctions = await Auction.find({ isPrivate: false }, [
+      "title",
+      "description",
+      "basePrice",
+      "seller",
+      "tags",
+    ])
+      .limit(20)
+      .populate("seller", ["username"]);
 
-  //   const auctions = await Auction.find({ isPrivate: false }, [
-  //     "title",
-  //     "description",
-  //     "basePrice",
-  //     "sellerUsername",
-  //     "tags",
-  //   ]).limit(20);
+    const parsedAuctions = auctions.map((data) => {
+      return parseAuction(data);
+    });
+    res.send(parsedAuctions);
+  }
+);
 
-  const parsedAuctions = auctions.map((data) => {
-    return parseAuction(data);
-  });
-  res.send(parsedAuctions);
-});
-
-router.post("/api/auction", async (req: Request, res: Response) => {
+router.post("/api/data/auction", async (req: Request, res: Response) => {
   const data = await Auction.findById(req.body.id);
 
   res.send(parseAuction(data));
