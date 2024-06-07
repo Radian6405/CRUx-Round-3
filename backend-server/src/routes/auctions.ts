@@ -25,8 +25,11 @@ router.get(
   }
 );
 
-router.post("/api/data/auction", async (req: Request, res: Response) => {
-  const data = await Auction.findById(req.body.id);
+router.post("/api/getone/auction", async (req: Request, res: Response) => {
+  const data = await Auction.findById(req.body.id).populate("seller", [
+    "username",
+    "email",
+  ]);
 
   res.send(parseAuction(data));
 });

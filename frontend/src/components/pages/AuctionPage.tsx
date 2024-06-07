@@ -1,48 +1,106 @@
 import { Button, Chip, InputAdornment, TextField } from "@mui/material";
 import { CommentCard, UserCard } from "../util/Cards";
 import { Header, SplitBar } from "../util/Misc";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 function AuctionPage() {
-  // const {auctionID} = useParams();
+  const { auctionID } = useParams();
+  const [auctionData, setAuctionData] = useState({
+    _id: "",
+    title: "",
+    description: "",
+    basePrice: 0,
+    tags: [],
+    seller: { username: "", email: "" },
+    startDate: "",
+    endDate: "",
+    isPrivate: false,
+  });
+  async function getAuctionData() {
+    const response = await axios.post(
+      "http://localhost:8000/api/getone/auction",
+      { id: auctionID },
+      { withCredentials: true }
+    );
+    setAuctionData(response.data);
+    // console.log(response.data);
+  }
+
+  useEffect(() => {
+    getAuctionData();
+  }, []);
+
+  function showDays() {
+    const start = new Date(auctionData.startDate).getTime();
+    const today = new Date().getTime();
+    const end = new Date(auctionData.endDate).getTime();
+
+    if (today < start) {
+      return (
+        <div className="text-lg">
+          <span className="text-gray-500">Starts in: </span>
+          {Math.round((start - today) / (1000 * 60 * 60 * 24))} days ({" "}
+          {new Date(auctionData.startDate).toDateString()} )
+        </div>
+      );
+    } else if (start <= today && today <= end) {
+      return (
+        <div className="text-lg">
+          <span className="text-gray-500">Ends in: </span>
+          {Math.round((end - today) / (1000 * 60 * 60 * 24))} days ({" "}
+          {new Date(auctionData.endDate).toDateString()} )
+        </div>
+      );
+    } else {
+      return (
+        <div className="text-lg">
+          <span className="text-gray-500">Ended on: </span>
+          {new Date(auctionData.endDate).toDateString()}
+        </div>
+      );
+    }
+  }
   return (
     <>
       <div className="m-5">
         <div className="flex flex-row justify-end">
-          <div className="w-3/4 flex flex-col gap-2 pr-5">
-            <div className="text-left">
-              <Header text="Auction 1" />
-              <div className="flex flex-row flex-wrap gap-2 pt-2">
-                <Chip label={"Private"} variant="outlined" size="small" />
-                <Chip label={"hello"} variant="outlined" size="small" />
-                <Chip label={"hi"} variant="outlined" size="small" />
-                <Chip label={"test"} variant="outlined" size="small" />
-                <Chip label={"hello1"} variant="outlined" size="small" />
-                <Chip label={"hello3"} variant="outlined" size="small" />
-                <Chip label={"hello2"} variant="outlined" size="small" />
+          <div className="w-3/4 flex flex-col pr-5">
+            <div className="text-left flex flex-col gap-1 capitalize">
+              <Header text={auctionData.title} />
+              <div className="flex flex-row flex-wrap gap-1 pt-2">
+                {/* <Chip label={"Private"} variant="outlined" size="small" /> */}
+                {/*placeholder*/}
+                {auctionData.tags.map((tag) => {
+                  return (
+                    <Chip
+                      key={crypto.randomUUID()}
+                      label={tag}
+                      variant="outlined"
+                      size="small"
+                    />
+                  );
+                })}
+              </div>
+              <div className="text-xl text-wrap truncate">
+                {auctionData.description}
               </div>
               <SplitBar />
-              <div className="text-lg text-gray-500 text-wrap truncate">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem
-                ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </div>
-              <div className="text-xl">Ends in: 5 days</div>
-              {/* <div className="text-xl">Starts in: 5 days</div> */}
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              {showDays()}
               <div className="flex flex-row items-center gap-5">
                 <div className="text-2xl w-[130px]">Start Bid:</div>
                 <div className="text-xl border-2 border-gray-00 rounded-md py-2 px-5">
-                  $ 40
+                  $ {auctionData.basePrice}
                 </div>
               </div>
               <div className="flex flex-row items-center gap-5">
                 <div className="text-2xl w-[130px]">Current Bid:</div>
                 <div className="text-xl border-2 border-gray-00 rounded-md py-2 px-5">
-                  $ 60
+                  {/*placeholder*/}$ 60
                 </div>
               </div>
 
@@ -92,10 +150,15 @@ function AuctionPage() {
           <div className="w-1/4 min-w-80 p-5 flex flex-col gap-2 bg-blue-500  ">
             <Header text="Users" />
             <div className="text-left text-xl">
-              <div>Current Biddings: 7</div>
+              <div>Current Bids: 7</div>
             </div>
             <SplitBar />
-            <UserCard userName="FunnyGuy" userRole="Seller" />
+            <UserCard
+              userName={auctionData.seller.username}
+              userRole="Seller"
+            />
+
+            {/*placeholder*/}
             <UserCard userName="superMan" userRole="Bid: $60" />
             <UserCard userName="superMan" userRole="Bid: $59" />
             <UserCard userName="spiderMan" userRole="Bid: $57" />
