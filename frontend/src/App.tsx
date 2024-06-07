@@ -8,6 +8,7 @@ import AuctionPage from "./components/pages/AuctionPage";
 import Login from "./components/pages/Login";
 import Logout from "./components/pages/Logout";
 import Register from "./components/pages/Register";
+import NotFound from "./components/pages/extras/NotFound";
 
 function App() {
   return (
@@ -23,6 +24,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/notfound" element={<NotFound />} />
       </Routes>
     </>
   );

@@ -1,11 +1,17 @@
 import { Button, Chip, InputAdornment, TextField } from "@mui/material";
 import { CommentCard, UserCard } from "../util/Cards";
 import { Header, SplitBar } from "../util/Misc";
-import { useParams } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import axios, { AxiosError } from "axios";
 import { useState, useEffect } from "react";
+import Notifbar from "../util/Notifbar";
 
 function AuctionPage() {
+  const navigate = useNavigate();
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifMessage, setNotifMessage] = useState("");
+
   const { auctionID } = useParams();
   const [auctionData, setAuctionData] = useState({
     _id: "",
@@ -19,13 +25,23 @@ function AuctionPage() {
     isPrivate: false,
   });
   async function getAuctionData() {
-    const response = await axios.post(
-      "http://localhost:8000/api/getone/auction",
-      { id: auctionID },
-      { withCredentials: true }
-    );
-    setAuctionData(response.data);
-    // console.log(response.data);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/getone/auction",
+        { id: auctionID },
+        { withCredentials: true }
+      );
+      setAuctionData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve auction data ";
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          return navigate("/notfound");
+        }
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
   }
 
   useEffect(() => {
@@ -169,6 +185,11 @@ function AuctionPage() {
           </div>
         </div>
       </div>
+      <Notifbar
+        open={notifOpen}
+        setOpen={setNotifOpen}
+        message={notifMessage}
+      />
     </>
   );
 }

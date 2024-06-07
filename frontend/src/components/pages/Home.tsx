@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { AuctionCard } from "../util/Cards";
 import { Header, SplitBar } from "../util/Misc";
 import axios from "axios";
+import Notifbar from "../util/Notifbar";
 
 function Home() {
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifMessage, setNotifMessage] = useState("");
   const [auctionData, setAuctionData] = useState([
     {
       _id: "",
@@ -16,19 +19,26 @@ function Home() {
   ]);
 
   async function getAuctionData() {
-    const response = await axios.get(
-      "http://localhost:8000/api/getall/auctions/public",
-      {
-        withCredentials: true,
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/getall/auctions/public",
+        { withCredentials: true }
+      );
+      setAuctionData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve auction data ";
+      if (error instanceof Error) {
+        errorMessage = error.message;
       }
-    );
-    setAuctionData(response.data);
-    // console.log(response.data);
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
   }
 
   useEffect(() => {
     getAuctionData();
   }, []);
+
   return (
     <>
       <div className="m-5 ">
@@ -51,6 +61,11 @@ function Home() {
           })}
         </div>
       </div>
+      <Notifbar
+        open={notifOpen}
+        setOpen={setNotifOpen}
+        message={notifMessage}
+      />
     </>
   );
 }

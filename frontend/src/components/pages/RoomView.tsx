@@ -1,10 +1,16 @@
 import { Header, SplitBar } from "../util/Misc";
 import { AuctionCard, UserCard } from "../util/Cards";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import Notifbar from "../util/Notifbar";
 
 function RoomView() {
+  const navigate = useNavigate();
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifMessage, setNotifMessage] = useState("");
+
   const { roomID } = useParams();
   const [roomData, setRoomData] = useState({
     _id: "",
@@ -27,29 +33,47 @@ function RoomView() {
   ]);
 
   async function getRoomData() {
-    const response = await axios.post(
-      "http://localhost:8000/api/getone/room",
-      { id: roomID },
-      { withCredentials: true }
-    );
-    setRoomData(response.data);
-    // console.log(response.data);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/getone/room",
+        { id: roomID },
+        { withCredentials: true }
+      );
+      setRoomData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve room data ";
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          return navigate("/notfound");
+        }
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
   }
-  useEffect(() => {
-    getRoomData();
-  }, []);
 
   async function getAuctionData() {
-    const response = await axios.post(
-      "http://localhost:8000/api/getall/auctions/room",
-      { id: roomID },
-      { withCredentials: true }
-    );
-    setAuctionData(response.data);
-    console.log(response.data);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/getall/auctions/room",
+        { id: roomID },
+        { withCredentials: true }
+      );
+      setAuctionData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve auction data ";
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          return navigate("/notfound");
+        }
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
   }
 
   useEffect(() => {
+    getRoomData();
     getAuctionData();
   }, []);
 
@@ -111,6 +135,11 @@ function RoomView() {
           </div>
         </div>
       </div>
+      <Notifbar
+        open={notifOpen}
+        setOpen={setNotifOpen}
+        message={notifMessage}
+      />
     </>
   );
 }

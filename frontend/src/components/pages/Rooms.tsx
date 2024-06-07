@@ -4,8 +4,12 @@ import { Header, SplitBar } from "../util/Misc";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Notifbar from "../util/Notifbar";
 
 function Rooms() {
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifMessage, setNotifMessage] = useState("");
+
   const [cookie] = useCookies(["token"]);
   const [roomData, setRoomData] = useState([
     {
@@ -18,12 +22,23 @@ function Rooms() {
   ]);
 
   async function getRoomData() {
-    const response = await axios.get("http://localhost:8000/api/getall/rooms", {
-      withCredentials: true,
-      headers: { Authorization: cookie.token },
-    });
-    setRoomData(response.data);
-    // console.log(response.data);
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/getall/rooms",
+        {
+          withCredentials: true,
+          headers: { Authorization: cookie.token },
+        }
+      );
+      setRoomData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve room data ";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
   }
 
   useEffect(() => {
@@ -47,6 +62,11 @@ function Rooms() {
           );
         })}
       </div>
+      <Notifbar
+        open={notifOpen}
+        setOpen={setNotifOpen}
+        message={notifMessage}
+      />
     </>
   );
 }
