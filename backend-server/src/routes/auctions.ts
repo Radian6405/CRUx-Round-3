@@ -10,9 +10,11 @@ router.get("/api/auctions/public", async (req: Request, res: Response) => {
     "title",
     "description",
     "basePrice",
-    "sellerUsername",
+    "seller",
     "tags",
-  ]).limit(20); //just for testing
+  ])
+    .limit(20)
+    .populate("seller", ["username"]); //just for testing
 
   //   const auctions = await Auction.find({ isPrivate: false }, [
   //     "title",

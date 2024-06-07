@@ -1,4 +1,3 @@
-import { required } from "joi";
 import mongoose from "mongoose";
 
 const AuctionSchema: mongoose.Schema = new mongoose.Schema({
@@ -14,10 +13,14 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
   basePrice: {
     type: mongoose.Schema.Types.Decimal128,
     required: true,
+    immutable: true,
+    min: 0,
   },
   startDate: {
     type: mongoose.Schema.Types.Date,
     required: true,
+    immutable: true,
+    default: () => Date.now(),
   },
   endDate: {
     type: mongoose.Schema.Types.Date,
@@ -34,9 +37,10 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
   },
 
   //user details
-  sellerUsername: {
-    type: mongoose.Schema.Types.String,
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "User",
   },
 
   //bidding details

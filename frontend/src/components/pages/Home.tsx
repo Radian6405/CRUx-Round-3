@@ -11,7 +11,7 @@ function Home() {
       description: "",
       basePrice: 0,
       tags: [],
-      sellerUsername: "",
+      seller: { username: "" },
     },
   ]);
 
@@ -42,7 +42,7 @@ function Home() {
                 to={`/auctions/${auction._id}`}
                 title={auction.title}
                 description={auction.description}
-                listerUsername={auction.sellerUsername}
+                listerUsername={auction.seller.username}
                 startBid={auction.basePrice}
                 currentBid={0} //placeholder
                 auctionTags={auction.tags}
