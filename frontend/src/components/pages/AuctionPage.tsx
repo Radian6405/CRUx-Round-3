@@ -9,6 +9,7 @@ import { useCookies } from "react-cookie";
 
 function AuctionPage() {
   const [bidValue, setBidValue] = useState(0);
+  const [comment, setComment] = useState("");
 
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -100,7 +101,28 @@ function AuctionPage() {
         setNotifOpen(true);
       }
     } catch (error) {
-      let errorMessage: string = "Failed to create room";
+      let errorMessage: string = "Failed to create a bid";
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
+  }
+  async function handleComment() {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/makeone/comment",
+        { text: comment, auction: auctionID },
+        { withCredentials: true, headers: { Authorization: cookie.token } }
+      );
+
+      if (response.status === 201) {
+        setNotifMessage(response.data);
+        setNotifOpen(true);
+      }
+    } catch (error) {
+      let errorMessage: string = "Failed to create a comment";
       if (error instanceof AxiosError) {
         errorMessage = error.response?.data;
       }
@@ -216,7 +238,28 @@ function AuctionPage() {
 
             <div className="flex flex-col gap-4">
               <Header text="Comments:" />
-              {/* placeholder */}
+              <div className="flex flex-row flex-wrap justify-between">
+                <TextField
+                  multiline
+                  id="auction-comment"
+                  placeholder="type here to comment"
+                  rows={3}
+                  className="w-5/6"
+                  value={comment}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setComment(event.target.value);
+                  }}
+                />
+                <div className="w-1/6 flex justify-center items-center">
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={() => handleComment()}
+                  >
+                    Comment
+                  </Button>
+                </div>
+              </div>
               <CommentCard
                 username="HelloDude"
                 body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

@@ -52,7 +52,7 @@ router.post(
         .status(201)
         .send(`You have bid for $${req.body.value} in ${findAuction.title}`);
     } catch (error) {
-      let errorMessage: string = "Failed to create room";
+      let errorMessage: string = "Failed to create a bid";
       if (error instanceof Error) {
         if (error.name === "CastError")
           errorMessage = "Cannot find auction. " + error.name;
@@ -77,7 +77,7 @@ router.post("/api/getall/bids", async (req: Request, res: Response) => {
     const parsedBids = findBids.map((bid) => parseBid(bid));
     res.status(200).send(parsedBids);
   } catch (error) {
-    let errorMessage: string = "Failed to find bids";
+    let errorMessage: string = "Failed to get bids";
     if (error instanceof Error) {
       if (error.name === "CastError")
         errorMessage = "Cannot find auction. " + error.name;
