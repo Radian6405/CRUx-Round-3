@@ -13,9 +13,17 @@ router.get(
     try {
       const auctions = await Auction.where("isPrivate")
         .equals(false)
-        .select(["title", "description", "basePrice", "seller", "tags"])
+        .select([
+          "title",
+          "description",
+          "basePrice",
+          "seller",
+          "tags",
+          "currentBid",
+        ])
         .limit(20)
-        .populate("seller", ["username"]);
+        .populate("seller", ["username"])
+        .populate("currentBid", ["value"]);
 
       const parsedAuctions = auctions.map((data) => {
         return parseAuction(data);
@@ -36,10 +44,17 @@ router.post(
     try {
       const auctions = await Auction.where("room")
         .equals(req.body.id)
-        .select(["title", "description", "basePrice", "seller", "tags"])
+        .select([
+          "title",
+          "description",
+          "basePrice",
+          "seller",
+          "tags",
+          "currentBid",
+        ])
         .limit(20)
-        .populate("seller", ["username"]);
-
+        .populate("seller", ["username"])
+        .populate("currentBid", ["value"]);
       const parsedAuctions = auctions.map((data) => {
         return parseAuction(data);
       });
@@ -57,10 +72,13 @@ router.post(
 
 router.post("/api/getone/auction", async (req: Request, res: Response) => {
   try {
-    const data = await Auction.findById(req.body.id).populate("seller", [
-      "username",
-      "email",
-    ]);
+    const data = await Auction.findById(req.body.id)
+      .populate("seller", ["username", "email"])
+      .populate({
+        path: "currentBid",
+        select: ["value", "bidder"],
+        populate: { path: "bidder", select: ["username"] },
+      });
 
     res.send(parseAuction(data));
   } catch (error) {
@@ -98,7 +116,6 @@ router.post(
             room: roomID,
           });
           const savedAuction = await newAuction.save();
-          // console.log(savedAuction);
         });
       } else {
         // if auction is public
@@ -108,14 +125,14 @@ router.post(
           isPrivate: false,
         });
         const savedAuction = await newAuction.save();
-        // console.log(savedAuction);
       }
       res.status(201).send("Sucessfully created auction(s)");
     } catch (error) {
       let errorMessage: string = "Failed to create auction";
       if (error instanceof Error) {
         errorMessage = error.message;
-        if (error.name === "CastError") errorMessage = "Bad Request. Cast error occurred";
+        if (error.name === "CastError")
+          errorMessage = "Bad Request. Cast error occurred";
       }
       res.status(401).send(errorMessage);
     }

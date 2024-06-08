@@ -5,12 +5,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import Notifbar from "../util/Notifbar";
+import { useCookies } from "react-cookie";
 
 function AuctionPage() {
-  const navigate = useNavigate();
+  const [bidValue, setBidValue] = useState(0);
 
+  const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
+  const [cookie] = useCookies(["token"]);
 
   const { auctionID } = useParams();
   const [auctionData, setAuctionData] = useState({
@@ -23,6 +26,14 @@ function AuctionPage() {
     startDate: "",
     endDate: "",
     isPrivate: false,
+    currentBid: {
+      _id: "",
+      value: 0,
+      bidder: {
+        _id: "",
+        username: "",
+      },
+    },
   });
   async function getAuctionData() {
     try {
@@ -42,10 +53,31 @@ function AuctionPage() {
       setNotifOpen(true);
     }
   }
-
   useEffect(() => {
     getAuctionData();
-  }, []);
+  }, [, notifOpen]);
+
+  async function handleBid() {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/makeone/bid",
+        { value: bidValue, auction: auctionID },
+        { withCredentials: true, headers: { Authorization: cookie.token } }
+      );
+
+      if (response.status === 201) {
+        setNotifMessage(response.data);
+        setNotifOpen(true);
+      }
+    } catch (error) {
+      let errorMessage: string = "Failed to create room";
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
+  }
 
   function showDays() {
     const start = new Date(auctionData.startDate).getTime();
@@ -85,8 +117,6 @@ function AuctionPage() {
             <div className="text-left flex flex-col gap-1 capitalize">
               <Header text={auctionData.title} />
               <div className="flex flex-row flex-wrap gap-1 pt-2">
-                {/* <Chip label={"Private"} variant="outlined" size="small" /> */}
-                {/*placeholder*/}
                 {auctionData.tags.map((tag) => {
                   return (
                     <Chip
@@ -115,7 +145,10 @@ function AuctionPage() {
               <div className="flex flex-row items-center gap-5">
                 <div className="text-2xl w-[130px]">Current Bid:</div>
                 <div className="text-xl border-2 border-gray-00 rounded-md py-2 px-5">
-                  {/*placeholder*/}$ 60
+                  ${" "}
+                  {auctionData.currentBid === undefined
+                    ? auctionData.basePrice
+                    : auctionData.currentBid.value}
                 </div>
               </div>
 
@@ -130,8 +163,21 @@ function AuctionPage() {
                       <InputAdornment position="start">$</InputAdornment>
                     ),
                   }}
+                  autoComplete="off"
+                  value={bidValue === 0 ? "" : bidValue}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setBidValue(
+                      parseFloat(event.target.value) > 0
+                        ? parseFloat(event.target.value)
+                        : 0
+                    );
+                  }}
                 />
-                <Button variant="outlined" size="large">
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={() => handleBid()}
+                >
                   Bid
                 </Button>
               </div>

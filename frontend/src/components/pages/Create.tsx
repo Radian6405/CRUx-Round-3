@@ -138,8 +138,8 @@ function CreateAuctions() {
           value={basePrice}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setBasePrice(
-              parseInt(event.target.value) >= 0
-                ? parseInt(event.target.value)
+              parseFloat(event.target.value) >= 0
+                ? parseFloat(event.target.value)
                 : 0
             );
           }}
@@ -247,7 +247,7 @@ function CreateRoom() {
         setNotifOpen(true);
       }
     } catch (error) {
-      let errorMessage: string = "Failed to create auction data ";
+      let errorMessage: string = "Failed to create room";
       if (error instanceof AxiosError) {
         errorMessage = error.response?.data;
       }

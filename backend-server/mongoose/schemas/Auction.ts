@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Bid } from "./Bid";
 
 const AuctionSchema: mongoose.Schema = new mongoose.Schema({
   //general details
@@ -37,7 +38,7 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
   },
   room: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Room"
+    ref: "Room",
   },
 
   //user details
@@ -48,6 +49,10 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
   },
 
   //bidding details
+  currentBid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Bid",
+  },
 });
 
 export const Auction = mongoose.model("Auction", AuctionSchema);

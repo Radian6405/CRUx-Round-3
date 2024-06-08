@@ -29,6 +29,10 @@ function RoomView() {
       basePrice: 0,
       tags: [],
       seller: { username: "" },
+      currentBid: {
+        _id: "",
+        value: 0,
+      },
     },
   ]);
 
@@ -104,7 +108,11 @@ function RoomView() {
                   description={auction.description}
                   listerUsername={auction.seller.username}
                   startBid={auction.basePrice}
-                  currentBid={0} //placeholder
+                  currentBid={
+                    auction.currentBid === undefined
+                      ? auction.basePrice
+                      : auction.currentBid.value
+                  }
                   auctionTags={auction.tags}
                 />
               );
