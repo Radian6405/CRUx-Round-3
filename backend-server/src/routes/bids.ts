@@ -19,6 +19,8 @@ router.post(
       ).populate("currentBid", "value");
       if (findAuction === null)
         return res.status(406).send("This auction does not exist");
+      if (String(findAuction.seller) === req.user._id)
+        return res.status(406).send("Cannot bid on your own auctions");
 
       const startTime: number = new Date(findAuction.startDate).getTime();
       const currentTime: number = new Date().getTime();
