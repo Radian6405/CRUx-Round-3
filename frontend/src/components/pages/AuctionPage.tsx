@@ -35,9 +35,8 @@ function AuctionPage() {
     } catch (error) {
       let errorMessage: string = "Failed to retrieve auction data ";
       if (error instanceof AxiosError) {
-        if (error.response?.status === 404) {
-          return navigate("/notfound");
-        }
+        if (error.response?.status === 404) return navigate("/notfound");
+        errorMessage = error.message;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);

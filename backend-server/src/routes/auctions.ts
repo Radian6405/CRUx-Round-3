@@ -115,7 +115,7 @@ router.post(
       let errorMessage: string = "Failed to create auction";
       if (error instanceof Error) {
         errorMessage = error.message;
-        if (error.name === "CastError") errorMessage = "Bad Request";
+        if (error.name === "CastError") errorMessage = "Bad Request. Cast error occurred";
       }
       res.status(401).send(errorMessage);
     }

@@ -12,7 +12,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { auctionCategories, Header } from "../util/Misc";
 import React from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Notifbar from "../util/Notifbar";
 import { useCookies } from "react-cookie";
 
@@ -45,25 +45,34 @@ function CreateAuctions() {
   const [roomData, setRoomData] = React.useState<any | null>([]);
 
   async function handleSubmit() {
-    const response = await axios.post(
-      "http://localhost:8000/api/makeone/auction",
-      {
-        title: title,
-        description: description,
-        basePrice: basePrice,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        tags: selectedTags,
-        rooms: selectedRooms,
-      },
-      {
-        withCredentials: true,
-        headers: { Authorization: cookie.token },
-      }
-    );
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/makeone/auction",
+        {
+          title: title,
+          description: description,
+          basePrice: basePrice,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          tags: selectedTags,
+          rooms: selectedRooms,
+        },
+        {
+          withCredentials: true,
+          headers: { Authorization: cookie.token },
+        }
+      );
 
-    if (response.status === 201) {
-      setNotifMessage(response.data);
+      if (response.status === 201) {
+        setNotifMessage(response.data);
+        setNotifOpen(true);
+      }
+    } catch (error) {
+      let errorMessage: string = "Failed to create auction";
+      if (error instanceof AxiosError) {
+        errorMessage = error.message;
+      }
+      setNotifMessage(errorMessage);
       setNotifOpen(true);
     }
   }
@@ -81,8 +90,8 @@ function CreateAuctions() {
       setRoomData(response.data.map((room: { name: string }) => room.name));
     } catch (error) {
       let errorMessage: string = "Failed to retrieve room data ";
-      if (error instanceof Error) {
-        errorMessage = error.message;
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -209,89 +218,150 @@ function CreateAuctions() {
 function CreateRoom() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedAdmins, setSelectedAdmins] = React.useState<any | null>([]);
+  const [selectedMembers, setSelectedMembers] = React.useState<any | null>([]);
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifMessage, setNotifMessage] = useState("");
+
+  const [cookie] = useCookies(["token"]);
+
+  async function handleSubmit() {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/makeone/room",
+        {
+          name: name,
+          description: description,
+          admins: selectedAdmins,
+          members: selectedMembers,
+        },
+        {
+          withCredentials: true,
+          headers: { Authorization: cookie.token },
+        }
+      );
+
+      if (response.status === 201) {
+        setNotifMessage(response.data);
+        setNotifOpen(true);
+      }
+    } catch (error) {
+      let errorMessage: string = "Failed to create auction data ";
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
+  }
 
   return (
-    <div className="p-5 flex flex-col gap-5 items-center border-2">
-      <Header text="Rooms" />
-      <div className="w-3/4 text-md text-gray-500 text-center">
-        Create private room to create auctions which are visible to only
-        selected users
-      </div>
-      <TextField
-        required
-        id="room-name"
-        label="Name"
-        sx={{ width: "500px" }}
-        value={name}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setName(event.target.value);
-        }}
-      />
-      <TextField
-        id="room-description"
-        label="Description"
-        multiline
-        rows={4}
-        sx={{ width: "500px" }}
-        value={description}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setDescription(event.target.value);
-        }}
-      />
-      <Stack spacing={3} sx={{ width: 500 }}>
-        <Autocomplete
-          multiple
-          options={emptyOptions}
-          freeSolo
-          renderTags={(value: readonly string[], getTagProps) =>
-            value.map((option: string, index: number) => {
-              const { key, ...tagProps } = getTagProps({ index });
-              return (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  key={key}
-                  {...tagProps}
-                />
-              );
-            })
-          }
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Admins" />
-          )}
+    <>
+      <div className="p-5 flex flex-col gap-5 items-center border-2">
+        <Header text="Rooms" />
+        <div className="w-3/4 text-md text-gray-500 text-center">
+          Create private room to create auctions which are visible to only
+          selected users
+        </div>
+        <TextField
+          required
+          id="room-name"
+          label="Name"
+          sx={{ width: "500px" }}
+          value={name}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setName(event.target.value);
+          }}
         />
-      </Stack>
+        <TextField
+          id="room-description"
+          label="Description"
+          multiline
+          rows={4}
+          sx={{ width: "500px" }}
+          value={description}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setDescription(event.target.value);
+          }}
+        />
+        <Stack spacing={3} sx={{ width: 500 }}>
+          <Autocomplete
+            multiple
+            options={[]}
+            freeSolo
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return (
+                  <Chip
+                    variant="outlined"
+                    label={option}
+                    key={key}
+                    {...tagProps}
+                  />
+                );
+              })
+            }
+            value={selectedAdmins}
+            onChange={(_event: any, newValue: any | null) => {
+              setSelectedAdmins(
+                newValue.map((option: { value: any }) => option.value || option)
+              );
+            }}
+            renderInput={(params) => (
+              <TextField {...params} variant="outlined" label="Admins" />
+            )}
+          />
+        </Stack>
 
-      <Stack spacing={3} sx={{ width: 500 }}>
-        <Autocomplete
-          multiple
-          options={emptyOptions}
-          freeSolo
-          renderTags={(value: readonly string[], getTagProps) =>
-            value.map((option: string, index: number) => {
-              const { key, ...tagProps } = getTagProps({ index });
-              return (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  key={key}
-                  {...tagProps}
-                />
-              );
-            })
-          }
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Members" />
-          )}
-        />
-      </Stack>
-      <Button variant="outlined" size="large">
-        Confirm
-      </Button>
-    </div>
+        <div>
+          <Stack spacing={3} sx={{ width: 500 }}>
+            <Autocomplete
+              multiple
+              options={[]}
+              freeSolo
+              renderTags={(value: readonly string[], getTagProps) =>
+                value.map((option: string, index: number) => {
+                  const { key, ...tagProps } = getTagProps({ index });
+                  return (
+                    <Chip
+                      variant="outlined"
+                      label={option}
+                      key={key}
+                      {...tagProps}
+                    />
+                  );
+                })
+              }
+              value={selectedMembers}
+              onChange={(_event: any, newValue: any | null) => {
+                setSelectedMembers(
+                  newValue.map(
+                    (option: { value: any }) => option.value || option
+                  )
+                );
+              }}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Members" />
+              )}
+            />
+          </Stack>
+          <div className="text-md text-gray-500 text-center">
+            Enter a username to add them to the room
+          </div>
+        </div>
+        <Button variant="outlined" size="large" onClick={() => handleSubmit()}>
+          Confirm
+        </Button>
+      </div>
+      <Notifbar
+        open={notifOpen}
+        setOpen={setNotifOpen}
+        message={notifMessage}
+      />
+    </>
   );
 }
-
-const emptyOptions: string[] = [];
 
 export default Create;
