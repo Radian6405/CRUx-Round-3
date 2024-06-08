@@ -12,13 +12,12 @@ router.get(
     if (!req.user) return res.status(404).send("no user found");
 
     try {
-      const findUser = await User.findOne({
-        username: String(req.user.username),
-      });
-      const userID = findUser !== null ? findUser._id : "1";
-
       const rooms = await Room.find({
-        $or: [{ members: userID }, { admins: userID }, { creator: userID }],
+        $or: [
+          { members: req.user._id },
+          { admins: req.user._id },
+          { creator: req.user._id },
+        ],
       })
         .select(["name", "description", "auctionCount", "creator"])
         .populate("creator", "username");
