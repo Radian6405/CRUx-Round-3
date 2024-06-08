@@ -10,6 +10,10 @@ export const hashPassword = (password: string) => {
 export const comparePassword = (plain: string, hashed: string) =>
   bcrypt.compareSync(plain, hashed);
 
+export function parseBid(data: any) {
+  return { ...data._doc, value: parseFloat(String(data.value)) };
+}
+
 export function parseAuction(data: any) {
   if (data.currentBid === undefined)
     return { ...data._doc, basePrice: parseFloat(String(data.basePrice)) };

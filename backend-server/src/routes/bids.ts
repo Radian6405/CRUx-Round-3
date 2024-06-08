@@ -3,6 +3,7 @@ import { Bid } from "../../mongoose/schemas/Bid";
 import { Auction } from "../../mongoose/schemas/Auction";
 import { Decimal128, ObjectId } from "mongoose";
 import { authenticateToken } from "../utils/authHelpers";
+import { parseBid } from "../utils/helpers";
 
 const router: Router = Router();
 
@@ -59,4 +60,28 @@ router.post(
     }
   }
 );
+
+router.post("/api/getall/bids", async (req: Request, res: Response) => {
+  try {
+    const findAuction = await Auction.findById(req.body.id);
+    if (!findAuction)
+      return res.status(404).send("couldnt find the given option");
+
+    const findBids = await Bid.where("auction")
+      .equals(req.body.id)
+      .select(["value", "bidder"])
+      .populate("bidder", ["username"]);
+
+    const parsedBids = findBids.map((bid) => parseBid(bid));
+    res.status(200).send(parsedBids);
+  } catch (error) {
+    let errorMessage: string = "Failed to find bids";
+    if (error instanceof Error) {
+      if (error.name === "CastError")
+        errorMessage = "Cannot find auction. " + error.name;
+      else errorMessage = error.message;
+    }
+    res.status(401).send(errorMessage);
+  }
+});
 export default router;

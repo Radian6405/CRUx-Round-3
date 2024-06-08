@@ -55,10 +55,8 @@ router.post(
         .limit(20)
         .populate("seller", ["username"])
         .populate("currentBid", ["value"]);
-      const parsedAuctions = auctions.map((data) => {
-        return parseAuction(data);
-      });
-      res.send(parsedAuctions);
+      const parsedAuctions = auctions.map((data) => parseAuction(data));
+      res.status(200).send(parsedAuctions);
     } catch (error) {
       let errorMessage: string = "Failed to find auction data ";
       if (error instanceof Error) {

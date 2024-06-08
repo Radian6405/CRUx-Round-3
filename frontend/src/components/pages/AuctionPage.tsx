@@ -35,6 +35,17 @@ function AuctionPage() {
       },
     },
   });
+  const [biddingData, setBiddingData] = useState([
+    {
+      _id: "",
+      value: 0,
+      bidder: {
+        _id: "",
+        username: "",
+      },
+    },
+  ]);
+
   async function getAuctionData() {
     try {
       const response = await axios.post(
@@ -42,7 +53,7 @@ function AuctionPage() {
         { id: auctionID },
         { withCredentials: true }
       );
-      setAuctionData(response.data);
+      if (response.status === 200) setAuctionData(response.data);
     } catch (error) {
       let errorMessage: string = "Failed to retrieve auction data ";
       if (error instanceof AxiosError) {
@@ -53,8 +64,27 @@ function AuctionPage() {
       setNotifOpen(true);
     }
   }
+  async function getBiddingData() {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/getall/bids",
+        { id: auctionID },
+        { withCredentials: true }
+      );
+      if (response.status === 200) setBiddingData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve bidding data ";
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) return navigate("/notfound");
+        errorMessage = error.message;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
+  }
   useEffect(() => {
     getAuctionData();
+    getBiddingData();
   }, [, notifOpen]);
 
   async function handleBid() {
@@ -186,6 +216,7 @@ function AuctionPage() {
 
             <div className="flex flex-col gap-4">
               <Header text="Comments:" />
+              {/* placeholder */}
               <CommentCard
                 username="HelloDude"
                 body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -211,22 +242,24 @@ function AuctionPage() {
           <div className="w-1/4 min-w-80 p-5 flex flex-col gap-2 bg-blue-500  ">
             <Header text="Users" />
             <div className="text-left text-xl">
-              <div>Current Bids: 7</div>
+              <div>Current Bids: {biddingData.length}</div>
             </div>
             <SplitBar />
             <UserCard
               userName={auctionData.seller.username}
               userRole="Seller"
             />
-
-            {/*placeholder*/}
-            <UserCard userName="superMan" userRole="Bid: $60" />
-            <UserCard userName="superMan" userRole="Bid: $59" />
-            <UserCard userName="spiderMan" userRole="Bid: $57" />
-            <UserCard userName="spiderMan" userRole="Bid: $55" />
-            <UserCard userName="spiderMan" userRole="Bid: $50" />
-            <UserCard userName="spiderMan" userRole="Bid: $47" />
-            <UserCard userName="spiderMan" userRole="Bid: $45" />
+            <div className="flex flex-col-reverse gap-2">
+              {biddingData.map((bid) => {
+                return (
+                  <UserCard
+                    key={crypto.randomUUID()}
+                    userName={bid.bidder.username}
+                    userRole={`$ ${bid.value}`}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
