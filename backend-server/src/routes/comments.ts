@@ -49,4 +49,26 @@ router.post(
   }
 );
 
+router.post("/api/getall/comments", async (req: Request, res: Response) => {
+  try {
+    const findAuction = await Auction.findById(req.body.id);
+    if (!findAuction) return res.status(404).send("auction not found");
+
+    const findComments = await Comment.where("auction")
+      .equals(req.body.id)
+      .select(["text", "user"])
+      .populate("user", ["username"]);
+
+    res.status(200).send(findComments);
+  } catch (error) {
+    let errorMessage: string = "Failed to get comments";
+    if (error instanceof Error) {
+      if (error.name === "CastError")
+        errorMessage = "Cannot find auction. " + error.name;
+      else errorMessage = error.message;
+    }
+    res.status(401).send(errorMessage);
+  }
+});
+
 export default router;

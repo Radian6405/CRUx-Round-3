@@ -46,6 +46,16 @@ function AuctionPage() {
       },
     },
   ]);
+  const [commentData, setCommentData] = useState([
+    {
+      _id: "",
+      text: "",
+      user: {
+        _id: "",
+        username: "",
+      },
+    },
+  ]);
 
   async function getAuctionData() {
     try {
@@ -83,9 +93,28 @@ function AuctionPage() {
       setNotifOpen(true);
     }
   }
+  async function getCommentData() {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/getall/comments",
+        { id: auctionID },
+        { withCredentials: true }
+      );
+      if (response.status === 200) setCommentData(response.data);
+    } catch (error) {
+      let errorMessage: string = "Failed to retrieve bidding data ";
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) return navigate("/notfound");
+        errorMessage = error.message;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
+  }
   useEffect(() => {
     getAuctionData();
     getBiddingData();
+    getCommentData();
   }, [, notifOpen]);
 
   async function handleBid() {
@@ -120,6 +149,7 @@ function AuctionPage() {
       if (response.status === 201) {
         setNotifMessage(response.data);
         setNotifOpen(true);
+        setComment("");
       }
     } catch (error) {
       let errorMessage: string = "Failed to create a comment";
@@ -260,26 +290,17 @@ function AuctionPage() {
                   </Button>
                 </div>
               </div>
-              <CommentCard
-                username="HelloDude"
-                body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              />
-              <CommentCard
-                username="HelloDude"
-                body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              />
-              <CommentCard
-                username="HelloDude"
-                body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              />
-              <CommentCard
-                username="HelloDude"
-                body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              />
+              <div className="flex flex-col-reverse gap-2">
+                {commentData.map((comment) => {
+                  return (
+                    <CommentCard
+                      key={crypto.randomUUID()}
+                      username={comment.user.username}
+                      body={comment.text}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
           <div className="w-1/4 min-w-80 p-5 flex flex-col gap-2 bg-blue-500  ">

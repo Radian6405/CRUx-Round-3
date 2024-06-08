@@ -86,4 +86,5 @@ router.post("/api/getall/bids", async (req: Request, res: Response) => {
     res.status(401).send(errorMessage);
   }
 });
+
 export default router;

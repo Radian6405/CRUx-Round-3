@@ -76,11 +76,11 @@ export function CommentCard({
 }) {
   return (
     <>
-      <div className="flex flex-row items-start p-3 gap-2 border-2 border-gray-300 rounded-md">
+      <div className="flex flex-row items-start p-3 gap-2 border-2 border-gray-300 rounded-md ">
         <PersonOutlineTwoTone fontSize="large" />
         <div className="flex flex-col">
-          <div className="text-xl">{username}</div>
-          <div className="text-lg truncate text-wrap">{body}</div>
+          <div className="text-xl font-bold">{username}</div>
+          <div className="text-lg truncate text-wrap line-clamp-3">{body}</div>
         </div>
       </div>
     </>
