@@ -98,31 +98,22 @@ router.post(
     if (req.user === undefined) return res.status(404).send("no user found");
 
     try {
-      if (req.body.rooms !== undefined && req.body.rooms.length !== 0) {
+      if (req.body.room !== null) {
         // if auction is private
-        const findRooms = await Room.find({
-          name: { $in: req.body.rooms },
-        }).select("_id");
-        const roomIDs: string[] = findRooms.map((room) => String(room._id));
+        const findRoom = await Room.findOne({ name: req.body.room });
+        if (findRoom === null) return res.status(404).send("room not found");
 
-        roomIDs.map(async (roomID) => {
-          if (req.user === undefined)
-            return res.status(404).send("no user found");
-
-          const newAuction = new Auction({
-            ...req.body,
-            seller: req.user._id,
-            isPrivate: true,
-            room: roomID,
-          });
-          const newRoom = await Room.findById(roomID);
-          if (newRoom === null) return res.status(404).send("room not found");
-
-          newRoom.auctionCount = parseInt(String(newRoom.auctionCount)) + 1;
-          const saveRoom = await newRoom.save();
-
-          const savedAuction = await newAuction.save();
+        const newAuction = new Auction({
+          ...req.body,
+          seller: req.user._id,
+          isPrivate: true,
+          room: findRoom._id,
         });
+
+        findRoom.auctionCount = parseInt(String(findRoom.auctionCount)) + 1;
+        const saveRoom = await findRoom.save();
+
+        const savedAuction = await newAuction.save();
       } else {
         // if auction is public
         const newAuction = new Auction({

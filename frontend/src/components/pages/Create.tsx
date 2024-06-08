@@ -36,7 +36,7 @@ function CreateAuctions() {
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [selectedTags, setSelectedTags] = React.useState<any | null>([]);
-  const [selectedRooms, setSelectedRooms] = React.useState<any | null>([]);
+  const [selectedRoom, setSelectedRoom] = React.useState<string | null>(null);
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
@@ -55,12 +55,9 @@ function CreateAuctions() {
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
           tags: selectedTags,
-          rooms: selectedRooms,
+          room: selectedRoom,
         },
-        {
-          withCredentials: true,
-          headers: { Authorization: cookie.token },
-        }
+        { withCredentials: true, headers: { Authorization: cookie.token } }
       );
 
       if (response.status === 201) {
@@ -183,19 +180,15 @@ function CreateAuctions() {
         />
         <div>
           <Autocomplete
-            multiple
             id="user-rooms"
-            limitTags={2}
             options={roomData}
             getOptionLabel={(roomData) => roomData}
             filterSelectedOptions
             renderInput={(params) => <TextField {...params} label="Rooms" />}
             sx={{ width: "500px" }}
-            value={selectedRooms}
+            value={selectedRoom}
             onChange={(_event: any, newValue: any | null) => {
-              setSelectedRooms(
-                newValue.map((option: { value: any }) => option.value || option)
-              );
+              setSelectedRoom(newValue);
             }}
           />
           <div className="text-md text-gray-500 text-center">

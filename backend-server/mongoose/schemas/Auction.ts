@@ -9,7 +9,6 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
   },
   description: {
     type: mongoose.Schema.Types.String,
-    required: true,
   },
   basePrice: {
     type: mongoose.Schema.Types.Decimal128,
