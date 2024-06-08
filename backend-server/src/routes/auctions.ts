@@ -115,6 +115,12 @@ router.post(
             isPrivate: true,
             room: roomID,
           });
+          const newRoom = await Room.findById(roomID);
+          if (newRoom === null) return res.status(404).send("room not found");
+
+          newRoom.auctionCount = parseInt(String(newRoom.auctionCount)) + 1;
+          const saveRoom = await newRoom.save();
+
           const savedAuction = await newAuction.save();
         });
       } else {
