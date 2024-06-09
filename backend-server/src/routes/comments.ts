@@ -30,6 +30,9 @@ router.post(
       if (endTime < currentTime)
         return res.status(406).send("You cannot comment. Auction has ended");
 
+      if (findAuction.isCommentDisabled)
+        return res.status(406).send("Comments disabled");
+
       const newComment = new Comment({
         ...req.body,
         user: req.user._id,

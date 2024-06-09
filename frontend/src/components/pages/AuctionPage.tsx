@@ -35,6 +35,7 @@ function AuctionPage() {
         username: "",
       },
     },
+    isCommentDisabled: false,
   });
   const [biddingData, setBiddingData] = useState([
     {
@@ -118,6 +119,7 @@ function AuctionPage() {
   }, [, notifOpen]);
 
   async function handleBid() {
+    console.log(auctionData.isCommentDisabled);
     try {
       const response = await axios.post(
         "http://localhost:8000/api/makeone/bid",
@@ -267,29 +269,37 @@ function AuctionPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <Header text="Comments:" />
-              <div className="flex flex-row flex-wrap justify-between">
-                <TextField
-                  multiline
-                  id="auction-comment"
-                  placeholder="type here to comment"
-                  rows={3}
-                  className="w-5/6"
-                  value={comment}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setComment(event.target.value);
-                  }}
-                />
-                <div className="w-1/6 flex justify-center items-center">
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={() => handleComment()}
-                  >
-                    Comment
-                  </Button>
+              <Header
+                text={
+                  auctionData.isCommentDisabled
+                    ? "Comments diabled"
+                    : "Comments:"
+                }
+              />
+              {!auctionData.isCommentDisabled && (
+                <div className="flex flex-row flex-wrap justify-between">
+                  <TextField
+                    multiline
+                    id="auction-comment"
+                    placeholder="type here to comment"
+                    rows={3}
+                    className="w-5/6"
+                    value={comment}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setComment(event.target.value);
+                    }}
+                  />
+                  <div className="w-1/6 flex justify-center items-center">
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      onClick={() => handleComment()}
+                    >
+                      Comment
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex flex-col-reverse gap-2">
                 {commentData.map((comment) => {
                   return (

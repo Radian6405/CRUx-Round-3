@@ -52,6 +52,12 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Bid",
   },
+
+  //comment details
+  isCommentDisabled: {
+    type: mongoose.Schema.Types.Boolean,
+    default: false,
+  },
 });
 
 export const Auction = mongoose.model("Auction", AuctionSchema);

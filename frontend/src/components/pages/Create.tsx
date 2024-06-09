@@ -1,7 +1,9 @@
 import {
   Autocomplete,
   Button,
+  Checkbox,
   Chip,
+  FormControlLabel,
   InputAdornment,
   Stack,
   TextField,
@@ -37,6 +39,7 @@ function CreateAuctions() {
   );
   const [selectedTags, setSelectedTags] = React.useState<any | null>([]);
   const [selectedRoom, setSelectedRoom] = React.useState<string | null>(null);
+  const [isCommentDisabled, setIsCommentDisabled] = useState(false);
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
@@ -56,6 +59,7 @@ function CreateAuctions() {
           endDate: endDate.toISOString(),
           tags: selectedTags,
           room: selectedRoom,
+          isCommentDisabled: isCommentDisabled,
         },
         { withCredentials: true, headers: { Authorization: cookie.token } }
       );
@@ -195,6 +199,18 @@ function CreateAuctions() {
             if no room is selected, auction is listed as public
           </div>
         </div>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isCommentDisabled}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                setIsCommentDisabled(event.target.checked)
+              }
+            />
+          }
+          label="Disable comments"
+        />
+
         <Button variant="outlined" size="large" onClick={() => handleSubmit()}>
           Confirm
         </Button>
