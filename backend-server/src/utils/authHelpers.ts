@@ -21,16 +21,16 @@ export function authenticateToken(req: Request, res: Response, next: Function) {
 
     const findUser = await User.findOne({
       username: String(user.username),
-    }).select(["username", "email"]);
+    }).select(["username", "email", "isVerified"]);
     if (findUser === null) return res.sendStatus(403);
 
     req.user = {
       username: String(findUser.username),
       _id: String(findUser._id),
       email: String(findUser.email),
+      isVerified: Boolean(findUser.isVerified),
     };
 
-    // console.log(req.user);
     next();
   });
 }
