@@ -6,6 +6,7 @@ declare global {
       _id: string;
       username: string;
       email: string;
+      isVerified: boolean;
     }
   }
 }

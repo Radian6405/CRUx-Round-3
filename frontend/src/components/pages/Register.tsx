@@ -41,16 +41,20 @@ function Register() {
   };
 
   async function handleRegister() {
-    if (password !== confirmPassword) return console.log("invalid confirm password");
+    if (password !== confirmPassword)
+      return console.log("invalid confirm password");
     try {
       const response = await axios.post(
         "http://localhost:8000/api/register",
         { username, email, password },
         { withCredentials: true }
       );
-      setCookie("token", response.data, { path: "/", maxAge: 60 * 60 * 24 });
+      setCookie("token", response.data.token, {
+        path: "/",
+        maxAge: 60 * 60 * 24,
+      });
 
-      return navigate("/");
+      return navigate("/verify");
     } catch (error) {
       console.error("Error during login:", error);
       return null;
