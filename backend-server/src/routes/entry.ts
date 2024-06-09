@@ -4,7 +4,7 @@ import { comparePassword, hashPassword } from "../utils/helpers";
 import { authenticateToken, generateAccessTokens } from "../utils/authHelpers";
 
 import dotenv from "dotenv";
-import { sendMail } from "../nodemailer/mailService";
+import { sendMail } from "../utils/nodemailer/mailService";
 dotenv.config();
 
 const router: Router = Router();
