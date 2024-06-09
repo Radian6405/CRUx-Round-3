@@ -1,13 +1,6 @@
 import nodemailer from "nodemailer";
-import winston from "winston";
 import dotenv from "dotenv";
 dotenv.config();
-
-const logger = winston.createLogger({
-  level: "debug",
-  format: winston.format.json(),
-  transports: [new winston.transports.Console()],
-});
 
 export const sendMail = async (
   from: string,
