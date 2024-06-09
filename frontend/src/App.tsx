@@ -10,6 +10,7 @@ import Logout from "./components/pages/Logout";
 import Register from "./components/pages/Register";
 import NotFound from "./components/pages/extras/NotFound";
 import Verify from "./components/pages/extras/Verify";
+import Verification from "./components/pages/extras/VerificationPage";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
 
         <Route path="/notfound" element={<NotFound />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/verify/email" element={<Verification />} />
       </Routes>
     </>
   );

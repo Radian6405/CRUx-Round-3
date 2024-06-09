@@ -49,12 +49,30 @@ router.get("/api/status", authenticateToken, (req: Request, res: Response) => {
   res.send(req.user);
 });
 
+router.post("/api/verify/email", async (req: Request, res: Response) => {
+  try {
+    if (req.body.token === undefined)
+      return res.status(404).send("invalid token");
+
+    const findUser = await User.findOne({ verifyToken: req.body.token });
+    if (findUser === null) return res.status(404).send("invalid token");
+
+    findUser.isVerified = true;
+    findUser.verifyToken = null;
+    const saveUser = await findUser.save();
+
+    res.status(201).send("User verified");
+  } catch (error) {
+    res.status(401).send(error);
+  }
+});
+
 async function sendVerifyMail(username: string, email: string, token: string) {
   const from: string = String(process.env.MAIL_USERNAME);
   const to: string = email;
   const subject: string = "Please verify your email address";
 
-  const verifyLink: string = `http://localhost:8000/verify/email?token=${token}`;
+  const verifyLink: string = `http://127.0.0.1:5173/verify/email?token=${token}`;
   const mailTemplate: string = `<p>
 Hi ${username},<br/>
 Thanks for getting started with BitsBids!<br/>
