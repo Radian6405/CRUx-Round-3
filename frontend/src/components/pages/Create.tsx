@@ -17,6 +17,7 @@ import React from "react";
 import axios, { AxiosError } from "axios";
 import Notifbar from "../util/Notifbar";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 function Create() {
   return (
@@ -32,6 +33,7 @@ function Create() {
 function CreateAuctions() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [FileList, setFileList] = useState<File[]>();
   const [basePrice, setBasePrice] = useState(0);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(
@@ -43,11 +45,16 @@ function CreateAuctions() {
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
+  const navigate = useNavigate();
 
   const [cookie] = useCookies(["token"]);
   const [roomData, setRoomData] = React.useState<any | null>([]);
 
   async function handleSubmit() {
+    setNotifMessage("Uploading files...");
+    setNotifOpen(true);
+    const uploadedFiles = await handleUploadFiles();
+
     try {
       const response = await axios.post(
         "http://localhost:8000/api/makeone/auction",
@@ -60,18 +67,51 @@ function CreateAuctions() {
           tags: selectedTags,
           room: selectedRoom,
           isCommentDisabled: isCommentDisabled,
+          uploadedFiles: uploadedFiles,
         },
         { withCredentials: true, headers: { Authorization: cookie.token } }
       );
 
       if (response.status === 201) {
-        setNotifMessage(response.data);
+        setNotifMessage(response.data.msg);
         setNotifOpen(true);
+        setTimeout(() => navigate(`/auctions/${response.data.id}`), 2000);
       }
     } catch (error) {
       let errorMessage: string = "Failed to create auction";
       if (error instanceof AxiosError) {
         errorMessage = error.message;
+      }
+      setNotifMessage(errorMessage);
+      setNotifOpen(true);
+    }
+  }
+
+  async function handleUploadFiles() {
+    try {
+      if (FileList === undefined) return;
+
+      const formData = new FormData();
+      FileList.forEach((file) => {
+        formData.append("images", file);
+      });
+      const response = await axios.post(
+        "http://localhost:8000/api/upload",
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: cookie.token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      let errorMessage: string = "Failed to upload file(s)";
+      if (error instanceof AxiosError) {
+        errorMessage = error.message;
+        console.log(error);
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -102,6 +142,17 @@ function CreateAuctions() {
     getRoomData();
   }, []);
 
+  function handleFileChange(e: React.FormEvent<HTMLInputElement>) {
+    let fileList: File[] = [];
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    for (let i = 0; i < Math.min(target.files.length, 5); i++) {
+      fileList.push(target.files[i]);
+    }
+    setFileList(fileList);
+  }
+
   return (
     <>
       <div className="p-5 flex flex-col gap-5 items-center border-2">
@@ -130,6 +181,18 @@ function CreateAuctions() {
             setDescription(event.target.value);
           }}
         />
+        <div>
+          <input
+            type="file"
+            name="images"
+            multiple
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+          <div className="text-md text-gray-500 text-center">
+            Maximum of 5 images are allowed
+          </div>
+        </div>
         <TextField
           required
           id="auction-base-price"
