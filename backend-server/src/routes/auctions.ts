@@ -4,6 +4,7 @@ import { Room } from "../../mongoose/schemas/Room";
 import { parseAuction } from "../utils/helpers";
 import { ObjectId } from "mongoose";
 import { authenticateToken } from "../utils/authHelpers";
+import { upload, uploadToCloudinary } from "../utils/cloudinary/fileFunctions";
 
 const router: Router = Router();
 
@@ -95,6 +96,7 @@ router.post(
   async (req: Request, res: Response) => {
     if (req.user === undefined) return res.status(404).send("no user found");
 
+    let newID;
     try {
       if (req.body.room !== null) {
         // if auction is private
@@ -112,6 +114,7 @@ router.post(
         const saveRoom = await findRoom.save();
 
         const savedAuction = await newAuction.save();
+        newID = savedAuction._id;
       } else {
         // if auction is public
         const newAuction = new Auction({
@@ -120,8 +123,12 @@ router.post(
           isPrivate: false,
         });
         const savedAuction = await newAuction.save();
+        newID = savedAuction._id;
       }
-      res.status(201).send("Sucessfully created auction(s)");
+      res.status(201).send({
+        msg: "Sucessfully created auction. Redirecting shortly...",
+        id: newID,
+      });
     } catch (error) {
       let errorMessage: string = "Failed to create auction";
       if (error instanceof Error) {
@@ -130,6 +137,25 @@ router.post(
           errorMessage = "Bad Request. Cast error occurred";
       }
       res.status(401).send(errorMessage);
+    }
+  }
+);
+
+router.post(
+  "/api/upload",
+  upload.array("images", 5),
+  uploadToCloudinary,
+  async (req: Request, res: Response) => {
+    try {
+      const cloudinaryUrls = req.body.cloudinaryUrls;
+      if (cloudinaryUrls.length === 0) {
+        console.error("No Cloudinary URLs found.");
+        return res.status(500).send("Internal Server Error");
+      }
+      const images = cloudinaryUrls;
+      return res.send(images);
+    } catch (error) {
+      return res.status(500).json({ error });
     }
   }
 );

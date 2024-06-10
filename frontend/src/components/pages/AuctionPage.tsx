@@ -36,6 +36,7 @@ function AuctionPage() {
       },
     },
     isCommentDisabled: false,
+    images: [],
   });
   const [biddingData, setBiddingData] = useState([
     {
@@ -214,6 +215,16 @@ function AuctionPage() {
               </div>
               <div className="text-xl text-wrap truncate">
                 {auctionData.description}
+              </div>
+            </div>
+            <SplitBar />
+            <div
+              className={auctionData.images.length !== 0 ? "block" : "hidden"}
+            >
+              <div className="flex flex-wrap gap-5">
+                {auctionData.images.map((image) => {
+                  return <img src={image} alt="image" className="w-[30%]" />;
+                })}
               </div>
               <SplitBar />
             </div>

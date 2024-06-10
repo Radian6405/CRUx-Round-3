@@ -4,12 +4,21 @@ import cors from "cors";
 import { config } from "./config";
 import Routes from "./routes/index";
 
+import { v2 as cloudinary } from "cloudinary";
+
 const PORT: number = config.server.port;
 const app: Express = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: true, credentials: true }));
 app.use(Routes);
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 (async function startUp() {
   try {
