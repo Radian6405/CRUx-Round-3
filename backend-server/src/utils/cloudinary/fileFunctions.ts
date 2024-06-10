@@ -26,7 +26,7 @@ export const uploadToCloudinary = async (
     const cloudinaryUrls: string[] = [];
     for (const file of files) {
       const resizedBuffer: Buffer = await sharp(file.buffer)
-        .resize({ width: 800, height: 600 })
+        .resize({ width: 1000, height: 1000 })
         .toBuffer();
 
       const uploadStream = cloudinary.uploader.upload_stream(

@@ -58,6 +58,13 @@ const AuctionSchema: mongoose.Schema = new mongoose.Schema({
     type: mongoose.Schema.Types.Boolean,
     default: false,
   },
+
+  //image details
+  images: [
+    {
+      type: mongoose.Schema.Types.String,
+    },
+  ],
 });
 
 export const Auction = mongoose.model("Auction", AuctionSchema);

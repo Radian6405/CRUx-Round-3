@@ -67,7 +67,7 @@ function CreateAuctions() {
           tags: selectedTags,
           room: selectedRoom,
           isCommentDisabled: isCommentDisabled,
-          uploadedFiles: uploadedFiles,
+          images: uploadedFiles,
         },
         { withCredentials: true, headers: { Authorization: cookie.token } }
       );
