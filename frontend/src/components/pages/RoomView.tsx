@@ -4,12 +4,15 @@ import axios, { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Notifbar from "../util/Notifbar";
+import { useCookies } from "react-cookie";
 
 function RoomView() {
   const navigate = useNavigate();
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
+  const [cookie] = useCookies(["token"]);
+ 
 
   const { roomID } = useParams();
   const [roomData, setRoomData] = useState({
@@ -41,7 +44,7 @@ function RoomView() {
       const response = await axios.post(
         "http://localhost:8000/api/getone/room",
         { id: roomID },
-        { withCredentials: true }
+        { withCredentials: true, headers: { Authorization: cookie.token }  }
       );
       setRoomData(response.data);
     } catch (error) {

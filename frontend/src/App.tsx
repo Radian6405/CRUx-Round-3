@@ -11,6 +11,7 @@ import Register from "./components/pages/Register";
 import NotFound from "./components/pages/extras/NotFound";
 import Verify from "./components/pages/extras/Verify";
 import Verification from "./components/pages/extras/VerificationPage";
+import NotAllowed from "./components/pages/extras/NotAllowed";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/notfound" element={<NotFound />} />
+        <Route path="/notallowed" element={<NotAllowed />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/verify/email" element={<Verification />} />
       </Routes>

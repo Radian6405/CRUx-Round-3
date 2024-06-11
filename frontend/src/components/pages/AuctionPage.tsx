@@ -65,12 +65,12 @@ function AuctionPage() {
       const response = await axios.post(
         "http://localhost:8000/api/getone/auction",
         { id: auctionID },
-        { withCredentials: true }
+        { withCredentials: true, headers: { Authorization: cookie.token } }
       );
       if (response.status === 200) {
         setAuctionData(response.data.data);
         setIsAuthenticated(response.data.isAuthenticated);
-        console.log(response.data.isAuthenticated);
+        if (!response.data.isAllowed) navigate("/notallowed");
       }
     } catch (error) {
       let errorMessage: string = "Failed to retrieve auction data ";

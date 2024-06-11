@@ -3,7 +3,10 @@ import { Auction } from "../../mongoose/schemas/Auction";
 import { Room } from "../../mongoose/schemas/Room";
 import { parseAuction } from "../utils/helpers";
 import { ObjectId } from "mongoose";
-import { authenticateToken } from "../utils/authHelpers";
+import {
+  authenticateToken,
+  softAucthenticateToken,
+} from "../utils/authHelpers";
 import { upload, uploadToCloudinary } from "../utils/cloudinary/fileFunctions";
 
 import dotenv from "dotenv";
@@ -73,29 +76,51 @@ router.post(
   }
 );
 
-router.post("/api/getone/auction", async (req: Request, res: Response) => {
-  try {
-    const data = await Auction.findById(req.body.id)
-      .populate("seller", ["username", "email"])
-      .populate({
-        path: "currentBid",
-        select: ["value", "bidder"],
-        populate: { path: "bidder", select: ["username"] },
-      });
+router.post(
+  "/api/getone/auction",
+  softAucthenticateToken,
+  async (req: Request, res: Response) => {
+    try {
+      const data = await Auction.findById(req.body.id)
+        .populate("seller", ["username", "email"])
+        .populate({
+          path: "currentBid",
+          select: ["value", "bidder"],
+          populate: { path: "bidder", select: ["username"] },
+        });
+      if (data == null) return res.status(401).send("no auction found");
 
-    res.send({
-      data: parseAuction(data),
-      isAuthenticated: !(req.headers.authorization == null),
-    });
-  } catch (error) {
-    let errorMessage: string = "Failed to find auction data ";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      if (error.name === "CastError") return res.status(404).send("wrong ID");
+      let isAllowed: boolean;
+      if (req.user === undefined) isAllowed = false;
+      else if (data.room == null) {
+        isAllowed = true;
+      } else {
+        const room = await Room.findById(data.room);
+        if (room === null) isAllowed = true;
+        else {
+          const admins: any = room.admins;
+          const members: any = room.members;
+          if (room.creator === req.user._id) isAllowed = true;
+          else if (admins.indexOf(req.user._id) !== -1) isAllowed = true;
+          else if (members.indexOf(req.user._id) !== -1) isAllowed = true;
+          else isAllowed = false;
+        }
+      }
+      res.send({
+        data: parseAuction(data),
+        isAuthenticated: !(req.user === undefined),
+        isAllowed: isAllowed,
+      });
+    } catch (error) {
+      let errorMessage: string = "Failed to find auction data ";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (error.name === "CastError") return res.status(404).send("wrong ID");
+      }
+      res.status(401).send(errorMessage);
     }
-    res.status(401).send(errorMessage);
   }
-});
+);
 
 router.post(
   "/api/makeone/auction",

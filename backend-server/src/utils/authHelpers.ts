@@ -11,6 +11,43 @@ export function generateAccessTokens(username: string) {
   });
 }
 
+export function softAucthenticateToken(
+  req: Request,
+  res: Response,
+  next: Function
+) {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader == null) {
+    req.user = undefined;
+    next();
+  } else {
+    jwt.verify(authHeader, TOKEN_SECRET, async (err: any, user: any) => {
+      if (err) {
+        req.user = undefined;
+        next();
+      }
+
+      const findUser = await User.findOne({
+        username: String(user.username),
+      }).select(["username", "email", "isVerified"]);
+      if (findUser === null) {
+        req.user === undefined;
+        next();
+      } else {
+        req.user = {
+          username: String(findUser.username),
+          _id: String(findUser._id),
+          email: String(findUser.email),
+          isVerified: Boolean(findUser.isVerified),
+        };
+      }
+
+      next();
+    });
+  }
+}
+
 export function authenticateToken(req: Request, res: Response, next: Function) {
   const authHeader = req.headers.authorization;
 
