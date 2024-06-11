@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { Room } from "../../mongoose/schemas/Room";
 import { User } from "../../mongoose/schemas/User";
 import { authenticateToken } from "../utils/authHelpers";
+import { ObjectId } from "mongoose";
 
 const router: Router = Router();
 
@@ -36,13 +37,35 @@ router.post(
   "/api/getone/room",
   authenticateToken,
   async (req: Request, res: Response) => {
+    if (req.user === undefined) return res.status(404).send("no user found");
+
     try {
       const data = await Room.findById(req.body.id)
         .populate("creator", "username")
         .populate("admins", "username")
         .populate("members", "username");
+      if (data == null) return res.status(404).send("wrong ID");
 
-      res.send(data);
+      let isAllowed: boolean;
+      const creator: any = data.creator;
+      const admins: any = data.admins;
+      const members: any = data.members;
+      if (String(creator._id) === String(req.user._id)) isAllowed = true;
+      else if (
+        admins
+          .map((user: { _id: ObjectId }) => String(user._id))
+          .indexOf(String(req.user._id)) !== -1
+      )
+        isAllowed = true;
+      else if (
+        members
+          .map((user: { _id: ObjectId }) => String(user._id))
+          .indexOf(String(req.user._id)) !== -1
+      )
+        isAllowed = true;
+      else isAllowed = false;
+
+      res.send({ data: data, isAllowed: isAllowed });
     } catch (error) {
       let errorMessage: string = "Failed to find room data ";
       if (error instanceof Error) {

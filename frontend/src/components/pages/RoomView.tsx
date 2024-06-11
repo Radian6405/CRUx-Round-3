@@ -12,7 +12,6 @@ function RoomView() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
   const [cookie] = useCookies(["token"]);
- 
 
   const { roomID } = useParams();
   const [roomData, setRoomData] = useState({
@@ -44,9 +43,10 @@ function RoomView() {
       const response = await axios.post(
         "http://localhost:8000/api/getone/room",
         { id: roomID },
-        { withCredentials: true, headers: { Authorization: cookie.token }  }
+        { withCredentials: true, headers: { Authorization: cookie.token } }
       );
-      setRoomData(response.data);
+      setRoomData(response.data.data);
+      if (!response.data.isAllowed) navigate("/notallowed");
     } catch (error) {
       let errorMessage: string = "Failed to retrieve room data ";
       if (error instanceof AxiosError) {
