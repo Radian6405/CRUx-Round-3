@@ -32,23 +32,27 @@ router.get(
   }
 );
 
-router.post("/api/getone/room", async (req: Request, res: Response) => {
-  try {
-    const data = await Room.findById(req.body.id)
-      .populate("creator", "username")
-      .populate("admins", "username")
-      .populate("members", "username");
+router.post(
+  "/api/getone/room",
+  authenticateToken,
+  async (req: Request, res: Response) => {
+    try {
+      const data = await Room.findById(req.body.id)
+        .populate("creator", "username")
+        .populate("admins", "username")
+        .populate("members", "username");
 
-    res.send(data);
-  } catch (error) {
-    let errorMessage: string = "Failed to find room data ";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      if (error.name === "CastError") return res.status(404).send("wrong ID");
+      res.send(data);
+    } catch (error) {
+      let errorMessage: string = "Failed to find room data ";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (error.name === "CastError") return res.status(404).send("wrong ID");
+      }
+      res.status(401).send(errorMessage);
     }
-    res.status(401).send(errorMessage);
   }
-});
+);
 
 router.post(
   "/api/makeone/room",
@@ -111,7 +115,8 @@ router.post(
       let errorMessage: string = "Failed to create room";
       if (error instanceof Error) {
         errorMessage = error.message;
-        if (error.name === "CastError") errorMessage = "Bad Request. Cast error occurred";
+        if (error.name === "CastError")
+          errorMessage = "Bad Request. Cast error occurred";
       }
       res.status(401).send(errorMessage);
     }

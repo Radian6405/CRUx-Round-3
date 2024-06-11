@@ -18,7 +18,7 @@ function Logout() {
           headers: { Authorization: cookie.token },
         }
       );
-      console.log(statusResponse);
+      return statusResponse;
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 403) return navigate("/login");

@@ -47,9 +47,8 @@ function RoomView() {
     } catch (error) {
       let errorMessage: string = "Failed to retrieve room data ";
       if (error instanceof AxiosError) {
-        if (error.response?.status === 404) {
-          return navigate("/notfound");
-        }
+        if (error.response?.status === 404) return navigate("/notfound");
+        if (error.response?.status === 403) return navigate("/login");
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
