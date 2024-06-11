@@ -14,7 +14,7 @@ export function generateAccessTokens(username: string) {
 export function authenticateToken(req: Request, res: Response, next: Function) {
   const authHeader = req.headers.authorization;
 
-  if (authHeader == null) return res.status(200).send({ message: "no token" });
+  if (authHeader == null) return res.status(403).send({ message: "no token" });
 
   jwt.verify(authHeader, TOKEN_SECRET, async (err: any, user: any) => {
     if (err) return res.sendStatus(403);

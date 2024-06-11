@@ -83,7 +83,10 @@ router.post("/api/getone/auction", async (req: Request, res: Response) => {
         populate: { path: "bidder", select: ["username"] },
       });
 
-    res.send(parseAuction(data));
+    res.send({
+      data: parseAuction(data),
+      isAuthenticated: !(req.headers.authorization == null),
+    });
   } catch (error) {
     let errorMessage: string = "Failed to find auction data ";
     if (error instanceof Error) {

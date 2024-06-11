@@ -1,12 +1,13 @@
 import { Chip } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Header, SplitBar } from "../util/Misc";
 import { useCookies } from "react-cookie";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import Notifbar from "../util/Notifbar";
 
 function Rooms() {
+  const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
 
@@ -33,7 +34,8 @@ function Rooms() {
       setRoomData(response.data);
     } catch (error) {
       let errorMessage: string = "Failed to retrieve room data ";
-      if (error instanceof Error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 403) return navigate("/login");
         errorMessage = error.message;
       }
       setNotifMessage(errorMessage);

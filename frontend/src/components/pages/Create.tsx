@@ -80,6 +80,7 @@ function CreateAuctions() {
     } catch (error) {
       let errorMessage: string = "Failed to create auction";
       if (error instanceof AxiosError) {
+        if (error.response?.status === 403) return navigate("/login");
         errorMessage = error.message;
       }
       setNotifMessage(errorMessage);
@@ -132,6 +133,7 @@ function CreateAuctions() {
     } catch (error) {
       let errorMessage: string = "Failed to retrieve room data ";
       if (error instanceof AxiosError) {
+        if (error.response?.status === 403) return navigate("/login");
         errorMessage = error.response?.data;
       }
       setNotifMessage(errorMessage);
@@ -295,6 +297,7 @@ function CreateRoom() {
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMessage, setNotifMessage] = useState("");
+  const navigate = useNavigate();
 
   const [cookie] = useCookies(["token"]);
 
@@ -321,6 +324,7 @@ function CreateRoom() {
     } catch (error) {
       let errorMessage: string = "Failed to create room";
       if (error instanceof AxiosError) {
+        if (error.response?.status === 403) return navigate("/login");
         errorMessage = error.response?.data;
       }
       setNotifMessage(errorMessage);

@@ -2,10 +2,32 @@ import { Button } from "@mui/material";
 import { Header } from "../util/Misc";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import axios, { AxiosError } from "axios";
+import { useEffect } from "react";
 
 function Logout() {
-  const [, , removeCookie] = useCookies(["token"]);
+  const [cookie, , removeCookie] = useCookies(["token"]);
   const navigate = useNavigate();
+
+  async function getUserData() {
+    try {
+      const statusResponse = await axios.get(
+        "http://localhost:8000/api/status",
+        {
+          withCredentials: true,
+          headers: { Authorization: cookie.token },
+        }
+      );
+      console.log(statusResponse);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 403) return navigate("/login");
+      }
+    }
+  }
+  useEffect(() => {
+    getUserData();
+  }, [, cookie]);
 
   function handleLogout() {
     removeCookie("token");

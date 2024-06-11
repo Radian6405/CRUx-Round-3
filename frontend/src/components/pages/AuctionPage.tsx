@@ -10,6 +10,7 @@ import { useCookies } from "react-cookie";
 function AuctionPage() {
   const [bidValue, setBidValue] = useState(0);
   const [comment, setComment] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -66,12 +67,16 @@ function AuctionPage() {
         { id: auctionID },
         { withCredentials: true }
       );
-      if (response.status === 200) setAuctionData(response.data);
+      if (response.status === 200) {
+        setAuctionData(response.data.data);
+        setIsAuthenticated(response.data.isAuthenticated);
+        console.log(response.data.isAuthenticated);
+      }
     } catch (error) {
       let errorMessage: string = "Failed to retrieve auction data ";
       if (error instanceof AxiosError) {
         if (error.response?.status === 404) return navigate("/notfound");
-        errorMessage = error.message;
+        else errorMessage = error.message;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -89,7 +94,7 @@ function AuctionPage() {
       let errorMessage: string = "Failed to retrieve bidding data ";
       if (error instanceof AxiosError) {
         if (error.response?.status === 404) return navigate("/notfound");
-        errorMessage = error.message;
+        else errorMessage = error.message;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -107,7 +112,7 @@ function AuctionPage() {
       let errorMessage: string = "Failed to retrieve bidding data ";
       if (error instanceof AxiosError) {
         if (error.response?.status === 404) return navigate("/notfound");
-        errorMessage = error.message;
+        else errorMessage = error.message;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -120,7 +125,6 @@ function AuctionPage() {
   }, [, notifOpen]);
 
   async function handleBid() {
-    console.log(auctionData.isCommentDisabled);
     try {
       const response = await axios.post(
         "http://localhost:8000/api/makeone/bid",
@@ -135,7 +139,9 @@ function AuctionPage() {
     } catch (error) {
       let errorMessage: string = "Failed to create a bid";
       if (error instanceof AxiosError) {
-        errorMessage = error.response?.data;
+        if (error.response?.status === 403)
+          errorMessage = "Login to start bidding";
+        else errorMessage = error.response?.data;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -157,7 +163,9 @@ function AuctionPage() {
     } catch (error) {
       let errorMessage: string = "Failed to create a comment";
       if (error instanceof AxiosError) {
-        errorMessage = error.response?.data;
+        if (error.response?.status === 403)
+          errorMessage = "Login to start commenting";
+        else errorMessage = error.response?.data;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);
@@ -247,7 +255,12 @@ function AuctionPage() {
                 </div>
               </div>
 
-              <div className="flex flex-row items-center justify-start gap-4">
+              <div
+                className={"flex flex-row items-center justify-start gap-4".concat(
+                  " ",
+                  isAuthenticated ? "" : "hidden"
+                )}
+              >
                 <div className="text-3xl">Set Amount:</div>
                 <TextField
                   required
@@ -287,7 +300,7 @@ function AuctionPage() {
                     : "Comments:"
                 }
               />
-              {!auctionData.isCommentDisabled && (
+              {!auctionData.isCommentDisabled && isAuthenticated && (
                 <div className="flex flex-row flex-wrap justify-between">
                   <TextField
                     multiline
@@ -311,7 +324,12 @@ function AuctionPage() {
                   </div>
                 </div>
               )}
-              <div className="flex flex-col-reverse gap-2">
+              <div
+                className={"flex flex-col-reverse gap-2".concat(
+                  " ",
+                  auctionData.isCommentDisabled ? "hidden" : ""
+                )}
+              >
                 {commentData.map((comment) => {
                   return (
                     <CommentCard
