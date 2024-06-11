@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { User } from "../../mongoose/schemas/User";
 import { comparePassword, hashPassword } from "../utils/helpers";
-import { authenticateToken, generateAccessTokens } from "../utils/authHelpers";
+import { authenticateToken, generateAccessTokens, softAucthenticateToken } from "../utils/authHelpers";
 
 import dotenv from "dotenv";
 import { sendMail } from "../utils/nodemailer/mailService";
@@ -45,7 +45,7 @@ router.post("/api/login", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/api/status", authenticateToken, (req: Request, res: Response) => {
+router.get("/api/status", softAucthenticateToken, (req: Request, res: Response) => {
   res.send(req.user);
 });
 

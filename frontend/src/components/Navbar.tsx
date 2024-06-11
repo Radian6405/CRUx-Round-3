@@ -20,7 +20,7 @@ export default function Navbar() {
           headers: { Authorization: cookie.token },
         }
       );
-      statusResponse.data.username !== undefined
+      statusResponse.data !== undefined && statusResponse.data.username !== undefined
         ? setUsername(statusResponse.data.username)
         : setUsername("");
     } catch (error) {

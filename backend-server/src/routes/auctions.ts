@@ -91,9 +91,9 @@ router.post(
       if (data == null) return res.status(401).send("no auction found");
 
       let isAllowed: boolean;
-      if (req.user === undefined) isAllowed = false;
-      else if (data.room == null) {
-        isAllowed = true;
+      if (req.user === undefined) {
+        if (data.room == null) isAllowed = true;
+        else isAllowed = false;
       } else {
         const room = await Room.findById(data.room);
         if (room === null) isAllowed = true;
