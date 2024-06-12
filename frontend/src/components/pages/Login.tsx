@@ -11,7 +11,7 @@ import { Header } from "../util/Misc";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useCookies } from "react-cookie";
 import Notifbar from "../util/Notifbar";
 
@@ -62,8 +62,10 @@ function Login() {
 
       return navigate("/");
     } catch (error) {
-      console.error("Error during login:", error);
-      return null;
+      if (error instanceof AxiosError) {
+        setNotifMessage(error.response?.data);
+        setNotifOpen(true);
+      }
     }
   }
   return (

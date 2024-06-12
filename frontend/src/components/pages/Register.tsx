@@ -11,7 +11,7 @@ import {
 import React, { useState } from "react";
 import { Header } from "../util/Misc";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useCookies } from "react-cookie";
 import Notifbar from "../util/Notifbar";
 
@@ -46,8 +46,7 @@ function Register() {
   async function handleRegister() {
     const isValidUsername = /^[0-9A-Za-z]{6,16}$/;
     const isValidPassword = /^(?=.*?[0-9])(?=.*?[A-Za-z]).{8,32}$/;
-    const isValidEmail =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const isValidEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
     if (
       username === "" ||
@@ -69,8 +68,8 @@ function Register() {
       setNotifOpen(true);
       return;
     }
-    if (isValidEmail.test(email)) {
-      setNotifMessage("not a valid email adress");
+    if (!isValidEmail.test(email)) {
+      setNotifMessage("not a valid email address");
       setNotifOpen(true);
       return;
     }
@@ -80,6 +79,8 @@ function Register() {
       return;
     }
 
+    setNotifMessage("Registering...");
+    setNotifOpen(true);
     try {
       const response = await axios.post(
         "http://localhost:8000/api/register",
@@ -93,8 +94,10 @@ function Register() {
 
       return navigate("/verify");
     } catch (error) {
-      console.error("Error during login:", error);
-      return null;
+      if (error instanceof AxiosError) {
+        setNotifMessage(error.response?.data);
+        setNotifOpen(true);
+      }
     }
   }
 
