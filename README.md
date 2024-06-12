@@ -29,6 +29,7 @@ Welcome to BITSBids, your premier destination for exciting online auctions! Disc
 
 - [Node](https://nodejs.org/en)
 - [React](https://react.dev/) with [vite](https://vitejs.dev/guide/)
+- [Tailwind CSS](https://tailwindcss.com/)
 - [Express](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/)
 - [Cloudinary](https://cloudinary.com/)
