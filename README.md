@@ -47,7 +47,7 @@ MONGO_PASSWORD=<your MongoDB password>
 SERVER_PORT=8000
 SERVER_ROUNDS=10
 
-MAIL_HOST=<your gmail host name>
+MAIL_HOST="gmail"
 MAIL_USERNAME=<your gmail address>
 MAIL_PASSWORD=<your gmaill app password>
 
