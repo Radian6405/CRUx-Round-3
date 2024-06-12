@@ -334,6 +334,11 @@ function CreateRoom() {
   const [cookie] = useCookies(["token"]);
 
   async function handleSubmit() {
+    if (name === "") {
+      setNotifMessage("Please enter a room name");
+      setNotifOpen(true);
+      return;
+    }
     try {
       const response = await axios.post(
         "http://localhost:8000/api/makeone/room",

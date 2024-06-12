@@ -81,6 +81,10 @@ router.post(
   "/api/makeone/room",
   authenticateToken,
   async (req: Request, res: Response) => {
+    if (req.body.name === "") {
+      return res.status(401).send("Invalid room name");
+    }
+
     if (req.user === undefined) return res.status(404).send("no user found");
 
     let hasError: Boolean = false;
