@@ -34,7 +34,6 @@ function Login() {
 
   async function handleLogin() {
     const isValidUsername = /^[0-9A-Za-z]{6,16}$/;
-    const isValidPassword = /^(?=.*?[0-9])(?=.*?[A-Za-z]).{8,32}$/;
 
     if (username === "" || password === "") {
       setNotifMessage("fill all the required fields");
@@ -43,11 +42,6 @@ function Login() {
     }
     if (!isValidUsername.test(username)) {
       setNotifMessage("Not a valid username");
-      setNotifOpen(true);
-      return;
-    }
-    if (!isValidPassword.test(password)) {
-      setNotifMessage("not a valid password");
       setNotifOpen(true);
       return;
     }

@@ -51,6 +51,36 @@ function CreateAuctions() {
   const [roomData, setRoomData] = React.useState<any | null>([]);
 
   async function handleSubmit() {
+    if (title === "") {
+      setNotifMessage("Please enter a title");
+      setNotifOpen(true);
+      return;
+    }
+    if (basePrice <= 0) {
+      setNotifMessage("Please enter a valid base price");
+      setNotifOpen(true);
+      return;
+    }
+
+    const startTime: number = new Date(startDate).getTime();
+    const currentTime: number = new Date().getTime();
+    const endTime: number = new Date(endDate).getTime();
+    if (startTime >= endTime) {
+      setNotifMessage("Please enter a valid date range");
+      setNotifOpen(true);
+      return;
+    }
+    if (currentTime > startTime) {
+      setNotifMessage("Please enter a valid start date");
+      setNotifOpen(true);
+      return;
+    }
+    if (currentTime > endTime) {
+      setNotifMessage("Please enter a valid end date");
+      setNotifOpen(true);
+      return;
+    }
+
     setNotifMessage("Uploading files...");
     setNotifOpen(true);
     const uploadedFiles = await handleUploadFiles();
@@ -81,7 +111,9 @@ function CreateAuctions() {
       let errorMessage: string = "Failed to create auction";
       if (error instanceof AxiosError) {
         if (error.response?.status === 403) return navigate("/login");
-        errorMessage = error.message;
+        else if (error.response?.status === 401)
+          errorMessage = error.response.data;
+        else errorMessage = error.message;
       }
       setNotifMessage(errorMessage);
       setNotifOpen(true);

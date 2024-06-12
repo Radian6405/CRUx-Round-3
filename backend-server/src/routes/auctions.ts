@@ -128,6 +128,26 @@ router.post(
   async (req: Request, res: Response) => {
     if (req.user === undefined) return res.status(404).send("no user found");
 
+    if (req.body.title === "") {
+      return res.status(401).send("Invalid title");
+    }
+    if (req.body.basePrice <= 0) {
+      return res.status(401).send("Invalid base price");
+    }
+
+    const startTime: number = new Date(req.body.startDate).getTime();
+    const currentTime: number = new Date().getTime();
+    const endTime: number = new Date(req.body.endDate).getTime();
+    if (startTime >= endTime) {
+      return res.status(401).send("Invalid date range");
+    }
+    if (currentTime > startTime) {
+      return res.status(401).send("Invalid start date");
+    }
+    if (currentTime > endTime) {
+      return res.status(401).send("Invalid end date");
+    }
+
     let newID;
     try {
       if (req.body.room !== null) {
