@@ -36,7 +36,7 @@ function Notifbar({
   return (
     <Snackbar
       open={open}
-      autoHideDuration={4000}
+      autoHideDuration={3000}
       onClose={handleClose}
       message={message}
       action={action}

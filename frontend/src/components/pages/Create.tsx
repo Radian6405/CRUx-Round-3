@@ -90,7 +90,7 @@ function CreateAuctions() {
 
   async function handleUploadFiles() {
     try {
-      if (FileList === undefined) return;
+      if (FileList === undefined) return [];
 
       const formData = new FormData();
       FileList.forEach((file) => {
